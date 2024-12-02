@@ -1,6 +1,8 @@
 // # Systems
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+
 
 // # Unity
 using UnityEngine;
@@ -8,17 +10,21 @@ using UnityEngine;
 public class Character : MonoBehaviour
 {
     // stats
-    private int hp = 0;
+    private int hp = 999;
     [SerializeField] private int speed;
     public int Speed => speed;
 
-    [SerializeField] private TimingCircle myCircle;
-    public TimingCircle MyCircle => myCircle;
+    [SerializeField] private TimingCircleSpawner timingCircle;
+    public TimingCircleSpawner TimingCircle => timingCircle;
 
-    public void DownHp(int damage)
+    [SerializeField] private Animator animator;
+
+    [SerializeField] private TMP_Text damageText;
+
+    public void Damaged(int damage)
     {
         hp -= damage;
-        if(hp < 0)
+        if (hp < 0)
         {
             Die();
         }
@@ -27,5 +33,30 @@ public class Character : MonoBehaviour
     private void Die()
     {
 
+    }
+
+    public void Attack()
+    {
+        animator.SetBool("Attacked", true);
+    }
+
+    public void BounceAnimation()
+    {
+        if (animator.GetBool("Commanded")) return;
+
+        animator.SetTrigger("Bounce");
+    }
+
+    public void ReBounce()
+    {
+        animator.SetBool("Attacked", false);
+        animator.SetBool("Commanded", false);
+        animator.SetTrigger("Bounce");
+    }
+
+    public void Commanded(Accuracy accuracy)
+    {
+        animator.SetBool("Commanded", true);
+        timingCircle.PressedCommanded(accuracy);
     }
 }

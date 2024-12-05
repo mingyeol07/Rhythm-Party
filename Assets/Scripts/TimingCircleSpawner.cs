@@ -52,7 +52,7 @@ public class TimingCircleSpawner : MonoBehaviour
         }
     }
 
-    public IEnumerator Co_PlayCircleReduce(double currentTime, double nextTime, int targetTick, bool isGuardTiming = false)
+    public IEnumerator Co_PlayReduceCircle(double currentTime, double nextTime, int targetTick, bool isGuardTiming = false)
     {
         isReadied = true;
         nextTargetTick = targetTick;

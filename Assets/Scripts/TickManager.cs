@@ -76,13 +76,14 @@ public class TickManager : MonoBehaviour
         if (tickCount == maxTickCount)
         {
             turnState = TurnState.None;
+            attackCount = 0;
             GameManager.Instance.SortPartyMember();
             tickCount = 0;
         }
         else if (tickCount == partyAttackTicks[partyAttackTicks.Length - 1]) // 파티의 어택 틱들이 모두 끝났다면
         {
             turnState = TurnState.EnemyCommanding;
-            GameManager.Instance.SortEnemyMember();
+            //GameManager.Instance.SortEnemyMember();
         }
 
         tickCount++;
@@ -110,22 +111,7 @@ public class TickManager : MonoBehaviour
 
         #region Attack
         // 플레이어의 어택커맨드 타이밍인 5,6,7,8의 1초 전에 미리 서클애니메이션 진행
-        if (tickCount == partyAttackTicks[0])
-        {
-            GameManager.Instance.PlayPartyAttack(0);
-        }
-        else if (tickCount == partyAttackTicks[1])
-        {
-            GameManager.Instance.PlayPartyAttack(1);
-        }
-        else if (tickCount == partyAttackTicks[2])
-        {
-            GameManager.Instance.PlayPartyAttack(2);
-        }
-        else if (tickCount == partyAttackTicks[3])
-        {
-            GameManager.Instance.PlayPartyAttack(3);
-        }
+
         else if (tickCount == partyAttackTicks[3] + 1)
         {
             GameManager.Instance.PlayPartyReBounce();
@@ -136,19 +122,19 @@ public class TickManager : MonoBehaviour
         // 플레이어의 가드커맨드 타이밍인 5,6,7,8의 1초 전에 미리 서클애니메이션 진행
         if (tickCount == enemyAttackTicks[0] - circleWaitTick)
         {
-            GameManager.Instance.PlayPartyGuardCircle(0, currentTime, circleWaitTime, enemyAttackTicks[0]);
+            GameManager.Instance.PlayPartyGuardCircle(0, currentTime, circleWaitTime);
         }
         else if (tickCount == enemyAttackTicks[1] - circleWaitTick)
         {
-            GameManager.Instance.PlayPartyGuardCircle(1, currentTime, circleWaitTime, enemyAttackTicks[1]);
+            GameManager.Instance.PlayPartyGuardCircle(1, currentTime, circleWaitTime);
         }
         else if (tickCount == enemyAttackTicks[2] - circleWaitTick)
         {
-            GameManager.Instance.PlayPartyGuardCircle(2, currentTime, circleWaitTime, enemyAttackTicks[2]);
+            GameManager.Instance.PlayPartyGuardCircle(2, currentTime, circleWaitTime);
         }
         else if (tickCount == enemyAttackTicks[3] - circleWaitTick)
         {
-            GameManager.Instance.PlayPartyGuardCircle(3, currentTime, circleWaitTime, enemyAttackTicks[3]);
+            GameManager.Instance.PlayPartyGuardCircle(3, currentTime, circleWaitTime);
         }
         #endregion
     }

@@ -9,16 +9,21 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
-    // stats
+    private Skill[] skills = new Skill[4];
+
+    // 스탯
     private int hp = 999;
     [SerializeField] private int speed;
     public int Speed => speed;
 
+    // 공격 기회를 알려주는 써클 
     [SerializeField] private TimingCircleSpawner timingCircle;
     public TimingCircleSpawner TimingCircle => timingCircle;
 
+    // 컴포넌트들
     [SerializeField] private Animator animator;
 
+    // UI들
     [SerializeField] private TMP_Text damageText;
 
     public void Damaged(int damage)
@@ -54,9 +59,11 @@ public class Character : MonoBehaviour
         animator.SetTrigger("Bounce");
     }
 
-    public void Commanded(Accuracy accuracy)
+    public void Commanded(Accuracy accuracy, int skillIndex)
     {
         animator.SetBool("Commanded", true);
         timingCircle.PressedCommanded(accuracy);
+
+        // 스킬 예약
     }
 }

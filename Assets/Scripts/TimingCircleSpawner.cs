@@ -28,9 +28,6 @@ public class TimingCircleSpawner : MonoBehaviour
     private bool isReadied = false;
     public bool IsReadied => isReadied;
 
-    private int nextTargetTick = 0;
-    public int NextTargetTick => nextTargetTick;
-
     [SerializeField] private TMP_Text accuracyText;
     [SerializeField] private Animator accuracyAnimator;
 
@@ -52,10 +49,9 @@ public class TimingCircleSpawner : MonoBehaviour
         }
     }
 
-    public IEnumerator Co_PlayReduceCircle(double currentTime, double nextTime, int targetTick, bool isGuardTiming = false)
+    public IEnumerator Co_PlayReduceCircle(double currentTime, double nextTime, bool isGuardTiming = false)
     {
         isReadied = true;
-        nextTargetTick = targetTick;
         // 줄어드는 원 생성
         GameObject reduceCircle = Instantiate(reduceCirclePrefab, reduceCircleParent);
 
@@ -88,7 +84,6 @@ public class TimingCircleSpawner : MonoBehaviour
 
         yield return StartCoroutine(Co_VanishCanvasGroup());
         isReadied = false;
-        nextTargetTick = 0;
     }
 
     private IEnumerator Co_AppearCanvasGroup(Material reduceCircleMaterial)
@@ -120,7 +115,7 @@ public class TimingCircleSpawner : MonoBehaviour
 
         while (canvasGroup.alpha > 0)
         {
-            canvasGroup.alpha -= Time.deltaTime * 5;
+            canvasGroup.alpha -= Time.deltaTime * 3;
 
             Color timingCircleColor = reusableTimingMaterial.color;
             timingCircleColor.a = Mathf.Clamp01(canvasGroup.alpha);

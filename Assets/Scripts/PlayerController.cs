@@ -10,10 +10,11 @@ using UnityEngine;
 /// </summary>
 public enum KeyIndexInArray
 {
-    UP,
-    LEFT,
-    DOWN,
-    RIGHT,
+    None = 99,
+    LEFT = 0,
+    UP = 1,
+    DOWN = 2,
+    RIGHT = 3,
 }
 
 public class PlayerController : MonoBehaviour

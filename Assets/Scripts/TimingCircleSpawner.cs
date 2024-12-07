@@ -1,7 +1,8 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
 public enum Accuracy
@@ -16,135 +17,100 @@ public enum Accuracy
 public class TimingCircleSpawner : MonoBehaviour
 {
     private CanvasGroup canvasGroup;
+    private Character character;
+
+    [Header("ReduceCircle")]
     [SerializeField] private GameObject reduceCirclePrefab;
     [SerializeField] private Transform reduceCircleParent;
+    
+    // 커맨드로 입력해야할 줄어드는 서클들이 차례대로 들어왔다가 나가는 큐
+    private Queue<ReduceCircle> reduceCricleQueue = new Queue<ReduceCircle>();
+    public Queue<ReduceCircle> ReduceCricleQueue => reduceCricleQueue;
+
+    [Header("TimingCircle")]
     [SerializeField] private Image img_timingCircle;
-    [SerializeField] private Material m_reduceCircleMaterial;
+    private Material timingCircleMaterial;
 
-    private Material reusableTimingMaterial;
-    private readonly string materialColorName = "_Color";
-
-    // 클릭 준비 상태
-    private bool isReadied = false;
-    public bool IsReadied => isReadied;
-
+    [Header("UI")]
     [SerializeField] private TMP_Text accuracyText;
     [SerializeField] private Animator accuracyAnimator;
 
     private void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
+        character = GetComponentInParent<Character>();
 
         // img_timingCircle의 머티리얼은 하나만 인스턴스화하여 재사용
-        reusableTimingMaterial = new Material(img_timingCircle.material);
-        img_timingCircle.material = reusableTimingMaterial;
+        timingCircleMaterial = new Material(img_timingCircle.material);
+        img_timingCircle.material = timingCircleMaterial;
     }
 
     private void OnDestroy()
     {
         // 씬 전환 시 재활용 머티리얼 메모리 해제
-        if (reusableTimingMaterial != null)
+        if (timingCircleMaterial != null)
         {
-            Destroy(reusableTimingMaterial);
+            Destroy(timingCircleMaterial);
         }
     }
 
     public IEnumerator Co_PlayReduceCircle(double currentTime, double nextTime, bool isGuardTiming = false)
     {
-        isReadied = true;
+        // 가드타이밍이라면 timingCircle의 색깔은 파랑, 아니라면 빨강
+        timingCircleMaterial.color = isGuardTiming ? Color.cyan : Color.red;
+
         // 줄어드는 원 생성
-        GameObject reduceCircle = Instantiate(reduceCirclePrefab, reduceCircleParent);
+        GameObject circle = Instantiate(reduceCirclePrefab, reduceCircleParent);
+        ReduceCircle reduceCircle = circle.GetComponent<ReduceCircle>();
+        reduceCricleQueue.Enqueue(reduceCircle);
 
-        // 줄어드는 원의 머테리얼 재활용 또는 인스턴스화
-        Image circleImage = reduceCircle.GetComponent<Image>();
-        Material reduceCircleMaterial = new Material(m_reduceCircleMaterial);
-        circleImage.material = reduceCircleMaterial;
+        // 원 줄어들기 코루틴
+        StartCoroutine(reduceCircle.Co_StartReduce(currentTime, nextTime));
 
-        reusableTimingMaterial.color = isGuardTiming ? Color.cyan : Color.red;
-
-        StartCoroutine(Co_AppearCanvasGroup(reduceCircleMaterial));
-
-        float startRadius = 0.5f;
-        float minRadius = 0.12f;
-
-        double startTime = Time.time;
-        double duration = nextTime - currentTime;
-
-        while (Time.time - startTime < duration)
-        {
-            double t = (Time.time - startTime) / duration;
-            reduceCircleMaterial.SetFloat("_Radius", Mathf.Lerp(startRadius, minRadius, (float)t));
-
-            if (!isReadied) break;
-            yield return null;
-        }
-
-        Destroy(reduceCircle);
-        Destroy(reduceCircleMaterial); // 파괴 시점 명확화
-
-        yield return StartCoroutine(Co_VanishCanvasGroup());
-        isReadied = false;
+        // 타이밍 원 나타내기
+        yield return StartCoroutine(Co_AppearCanvasGroup());
     }
 
-    private IEnumerator Co_AppearCanvasGroup(Material reduceCircleMaterial)
+    private IEnumerator Co_AppearCanvasGroup()
     {
-        if (reduceCircleMaterial == null || reusableTimingMaterial == null) yield break;
-
         while (canvasGroup.alpha < 1)
         {
-            canvasGroup.alpha += Time.deltaTime * 3;
-
-            Color timingCircleColor = reusableTimingMaterial.color;
-            timingCircleColor.a = Mathf.Clamp01(canvasGroup.alpha);
-            reusableTimingMaterial.SetColor(materialColorName, timingCircleColor);
-
-            Color reduceCircleColor = reduceCircleMaterial.color;
-            reduceCircleColor.a = Mathf.Clamp01(canvasGroup.alpha);
-            reduceCircleMaterial.SetColor(materialColorName, reduceCircleColor);
-
-            if (!isReadied) break;
-            yield return null;
+            canvasGroup.alpha = Mathf.Clamp01(canvasGroup.alpha + Time.deltaTime * 5);
+            yield return new WaitForSeconds(0.01f); // 프레임 간격 조정
         }
-
         canvasGroup.alpha = 1;
     }
 
-    private IEnumerator Co_VanishCanvasGroup()
+    public IEnumerator Co_VanishCanvasGroup()
     {
-        if (reusableTimingMaterial == null) yield break;
-
         while (canvasGroup.alpha > 0)
         {
-            canvasGroup.alpha -= Time.deltaTime * 3;
-
-            Color timingCircleColor = reusableTimingMaterial.color;
-            timingCircleColor.a = Mathf.Clamp01(canvasGroup.alpha);
-            reusableTimingMaterial.SetColor(materialColorName, timingCircleColor);
-
-            if (!isReadied) break;
-            yield return null;
+            Debug.Log("DDD");
+            canvasGroup.alpha = Mathf.Clamp01(canvasGroup.alpha - Time.deltaTime * 3);
+            yield return new WaitForSeconds(0.01f); // 프레임 간격 조정
         }
-
         canvasGroup.alpha = 0;
     }
 
-    public void PressedCommanded(Accuracy accuracy)
+    public void PressedCommanded(Accuracy accuracy, Skill skill)
     {
-        isReadied = false;
-        
+        StartCoroutine(reduceCricleQueue.Peek().Co_Vanish());
+        reduceCricleQueue.Peek().ExitCircleQueue();
+        character.SkillQueue.Enqueue(skill);
+
         switch(accuracy)
         {
             case Accuracy.Critical:
-                accuracyText.text = "Critical!";
+                accuracyText.text = "CRITICAL!";
                 break;
             case Accuracy.Strike:
-                accuracyText.text = "Strike";
+                accuracyText.text = "STRIKE";
                 break;
             case Accuracy.Hit:
-                accuracyText.text = "Hit";
+                accuracyText.text = "HIT";
                 break;
             case Accuracy.Miss:
-                accuracyText.text = "Miss";
+                accuracyText.text = "MISS";
                 break;
         }
 

@@ -17,14 +17,28 @@ public class Character : MonoBehaviour
     public int Speed => speed;
 
     // 공격 기회를 알려주는 써클 
-    [SerializeField] private TimingCircleSpawner timingCircle;
-    public TimingCircleSpawner TimingCircle => timingCircle;
+    [SerializeField] private TimingCircleSpawner circleSpawner;
+    public TimingCircleSpawner CricleSpawner => circleSpawner;
+
+    // 입력된 커맨드에 따라 스킬들이 순서대로 저장되는 큐
+    private Queue<Skill> skillQueue = new Queue<Skill>();
+    public Queue<Skill> SkillQueue => skillQueue;
 
     // 컴포넌트들
     [SerializeField] private Animator animator;
 
     // UI들
     [SerializeField] private TMP_Text damageText;
+
+    private void Start()
+    {
+        skills = new Skill[4];
+
+        skills[0] = new Skill();
+        skills[1] = new Skill();
+        skills[2] = new Skill();
+        skills[3] = new Skill();
+    }
 
     public void Damaged(int damage)
     {
@@ -42,7 +56,17 @@ public class Character : MonoBehaviour
 
     public void Attack()
     {
+        if(skillQueue.Count == 0)
+        {
+            // 스킬 실패 애니메이션
+            return;
+        }
+
         animator.SetBool("Attacked", true);
+
+        Skill skill = skillQueue.Dequeue();
+
+        skill.Activate();
     }
 
     public void BounceAnimation()
@@ -62,8 +86,7 @@ public class Character : MonoBehaviour
     public void Commanded(Accuracy accuracy, int skillIndex)
     {
         animator.SetBool("Commanded", true);
-        timingCircle.PressedCommanded(accuracy);
-
+        circleSpawner.PressedCommanded(accuracy, skills[skillIndex]);
         // 스킬 예약
     }
 }

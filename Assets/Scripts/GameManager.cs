@@ -82,6 +82,13 @@ public class GameManager : MonoBehaviour
         // 아이템에 의한 공격 기회 추가
         EnemyAdditionalAttackChance?.Invoke();
         EnemyAdditionalAttackChance = null;
+
+        Character character = partyMembers[3];
+
+        for (int i = 0; i < 4; i++)
+        {
+            sortedPartyAttackSequence[i].Add(character);
+        }
     }
 
     public void PlayPartyTimingCircle(int index, double startTime, double endTime)
@@ -90,7 +97,7 @@ public class GameManager : MonoBehaviour
 
         foreach(Character character in sortedPartyAttackSequence[index])
         {
-            StartCoroutine(character.TimingCircle.Co_PlayReduceCircle(startTime, endTime, false));
+            StartCoroutine(character.CricleSpawner.Co_PlayReduceCircle(startTime, endTime, false));
         }
     }
     public void PlayPartyGuardCircle(int index, double startTime, double endTime)
@@ -99,7 +106,7 @@ public class GameManager : MonoBehaviour
 
         foreach (Character character in sortedPartyGuardSequence[index])
         {
-            StartCoroutine(character.TimingCircle.Co_PlayReduceCircle(startTime, endTime, true));
+            StartCoroutine(character.CricleSpawner.Co_PlayReduceCircle(startTime, endTime, true));
         }
     }
 
@@ -112,9 +119,9 @@ public class GameManager : MonoBehaviour
     }
     public void AttackPartyMember(int index)
     {
-        for(int i=0; i < partyMembers.Count;i++)
+        for(int i=0; i < sortedPartyAttackSequence[index].Count;i++)
         {
-           // sortedPartyAttackSequence[index][i].Attack();
+            sortedPartyAttackSequence[index][i].Attack();
         }
     }
     #endregion
@@ -171,9 +178,9 @@ public class GameManager : MonoBehaviour
             if (pressCount >= sortedPartyGuardSequence.Count) 
                 return;
 
-            if (!sortedPartyGuardSequence[pressCount][0].TimingCircle.IsReadied)
+            if (sortedPartyGuardSequence[pressCount][0].CricleSpawner.ReduceCricleQueue.Count == 0)
             {
-                // 서클이 펴지기 직전이라 아무일도 없음
+                // 서클이 아무것도 없는경우
                 return;
             }
 
@@ -184,12 +191,6 @@ public class GameManager : MonoBehaviour
             if (pressCount >= sortedPartyAttackSequence.Count)
                 return;
 
-            if (!sortedPartyAttackSequence[pressCount][0].TimingCircle.IsReadied)
-            {
-                // 서클이 펴지기 직전이라 아무일도 없음
-                return;
-            }
-            // 키에 따라 몇번째 스킬을 쓸건지 설정
             int skillIndex = (int)key;
 
             Command(skillIndex);
@@ -214,7 +215,7 @@ public class GameManager : MonoBehaviour
         {
             Character member = sortedPartyAttackSequence[pressCount][i];
             Accuracy accuracy = tickManager.GetAccuracy(9 + (2 * pressCount));
-            //member?.Guard();
+            //member?.Guard(accuracy);
         }
     }
     #endregion

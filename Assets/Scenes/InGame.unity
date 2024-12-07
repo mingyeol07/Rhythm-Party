@@ -275,7 +275,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
-  timingCircle: {fileID: 0}
+  circleSpawner: {fileID: 0}
   animator: {fileID: 1692249781}
   damageText: {fileID: 0}
 --- !u!1 &205168751
@@ -325,7 +325,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
-  timingCircle: {fileID: 558170056}
+  circleSpawner: {fileID: 558170056}
   animator: {fileID: 910528741}
   damageText: {fileID: 0}
 --- !u!224 &510459423 stripped
@@ -631,7 +631,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
-  timingCircle: {fileID: 0}
+  circleSpawner: {fileID: 0}
   animator: {fileID: 2080531447}
   damageText: {fileID: 0}
 --- !u!1 &994443290
@@ -680,7 +680,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
-  timingCircle: {fileID: 0}
+  circleSpawner: {fileID: 0}
   animator: {fileID: 1926952113}
   damageText: {fileID: 0}
 --- !u!1 &999775212
@@ -730,7 +730,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 2
-  timingCircle: {fileID: 1224919753}
+  circleSpawner: {fileID: 1224919753}
   animator: {fileID: 75990380}
   damageText: {fileID: 0}
 --- !u!1 &1097784983
@@ -863,6 +863,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TimingCircleCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 4903790918257718948, guid: 66cfca5e837e033498fc63127edd56a6, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 66cfca5e837e033498fc63127edd56a6, type: 3}
 --- !u!224 &1224919752 stripped
@@ -927,7 +931,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
-  timingCircle: {fileID: 0}
+  circleSpawner: {fileID: 0}
   animator: {fileID: 1719776173}
   damageText: {fileID: 0}
 --- !u!1 &1261919758
@@ -1128,7 +1132,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 4
-  timingCircle: {fileID: 1766185005}
+  circleSpawner: {fileID: 1766185005}
   animator: {fileID: 1781175034}
   damageText: {fileID: 0}
 --- !u!1 &1692249779
@@ -1566,6 +1570,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TimingCircleCanvas
       objectReference: {fileID: 0}
+    - target: {fileID: 4903790918257718948, guid: 66cfca5e837e033498fc63127edd56a6, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 66cfca5e837e033498fc63127edd56a6, type: 3}
 --- !u!224 &1766185004 stripped
@@ -1843,7 +1851,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 3
-  timingCircle: {fileID: 1875251885}
+  circleSpawner: {fileID: 1875251885}
   animator: {fileID: 1784546005}
   damageText: {fileID: 0}
 --- !u!1 &1819723023
@@ -1909,6 +1917,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1802269842}
     m_Modifications:
+    - target: {fileID: 4903790917009138553, guid: 66cfca5e837e033498fc63127edd56a6, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 4903790918257718938, guid: 66cfca5e837e033498fc63127edd56a6, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1996,6 +2008,10 @@ PrefabInstance:
     - target: {fileID: 4903790918257718939, guid: 66cfca5e837e033498fc63127edd56a6, type: 3}
       propertyPath: m_Name
       value: TimingCircleCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 4903790918257718948, guid: 66cfca5e837e033498fc63127edd56a6, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 66cfca5e837e033498fc63127edd56a6, type: 3}
@@ -2423,6 +2439,14 @@ PrefabInstance:
     - target: {fileID: 4903790918257718939, guid: 66cfca5e837e033498fc63127edd56a6, type: 3}
       propertyPath: m_Name
       value: TimingCircleCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 4903790918257718948, guid: 66cfca5e837e033498fc63127edd56a6, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4903790918544504642, guid: 66cfca5e837e033498fc63127edd56a6, type: 3}
+      propertyPath: m_Alpha
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 66cfca5e837e033498fc63127edd56a6, type: 3}

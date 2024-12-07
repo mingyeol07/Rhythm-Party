@@ -68,7 +68,7 @@ MonoBehaviour:
       m_Calls: []
   m_text: 30
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: dde1dd4501a763c4c88d06f23ea6fc8f, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1f85420c2acdf26498abd8431e8b53e9, type: 2}
   m_sharedMaterial: {fileID: 4551175727285552750, guid: dde1dd4501a763c4c88d06f23ea6fc8f, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
@@ -132,7 +132,7 @@ MonoBehaviour:
   m_margin: {x: 0, y: 0, z: 0, w: 0}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
+  m_hasFontAssetChanged: 1
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &4903790917009138559
@@ -172,7 +172,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 2}
-  m_SizeDelta: {x: 2, y: 1}
+  m_SizeDelta: {x: 3, y: 1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4903790917009138552
 CanvasRenderer:
@@ -204,8 +204,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Critical!
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b82b8851621fcd148a84c636d0596a42, type: 2}
-  m_sharedMaterial: {fileID: 3823505163101608065, guid: b82b8851621fcd148a84c636d0596a42, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 1f85420c2acdf26498abd8431e8b53e9, type: 2}
+  m_sharedMaterial: {fileID: -3528322094092340568, guid: 1f85420c2acdf26498abd8431e8b53e9, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -303,6 +303,7 @@ GameObject:
   - component: {fileID: 4903790918028350294}
   - component: {fileID: 4903790918028350288}
   - component: {fileID: 4903790918028350289}
+  - component: {fileID: 6707003814716876370}
   m_Layer: 5
   m_Name: Cricle
   m_TagString: Untagged
@@ -368,6 +369,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &6707003814716876370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4903790918028350295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86a62166b4670ea41ae6b4134294957b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4903790918225831525
 GameObject:
   m_ObjectHideFlags: 0
@@ -574,7 +587,6 @@ MonoBehaviour:
   reduceCirclePrefab: {fileID: 7901497108869362216, guid: 718691b785e52b449b9e8b252a538f69, type: 3}
   reduceCircleParent: {fileID: 4903790918225831524}
   img_timingCircle: {fileID: 4903790918028350289}
-  m_reduceCircleMaterial: {fileID: 2100000, guid: fa787148bd64c03479929b95f974df8e, type: 2}
   accuracyText: {fileID: 4903790917009138553}
   accuracyAnimator: {fileID: 4903790917009138555}
 --- !u!1 &4903790918658664756

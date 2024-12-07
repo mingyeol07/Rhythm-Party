@@ -129,22 +129,22 @@ public class TickManager : MonoBehaviour
         }
 
         // 타이밍을 늦어서 못누른채 반박자가 넘어간다면 Miss가 떠야함
-        if (tickCount == partyCommandTicks[0] +2 && GameManager.Instance.PressCount == 0)
-        {
-            GameManager.Instance.PressedKey(KeyIndexInArray.None);
-        }
-        else if (tickCount == partyCommandTicks[1] + 2 && GameManager.Instance.PressCount == 1)
-        {
-            GameManager.Instance.PressedKey(KeyIndexInArray.None);
-        }
-        else if (tickCount == partyCommandTicks[2] + 2 && GameManager.Instance.PressCount == 2)
-        {
-            GameManager.Instance.PressedKey(KeyIndexInArray.None);
-        }
-        else if (tickCount == partyCommandTicks[3] +2 && GameManager.Instance.PressCount == 3)
-        {
-            GameManager.Instance.PressedKey(KeyIndexInArray.None);
-        }
+        //if (tickCount == partyCommandTicks[0] +2 && GameManager.Instance.PressCount == 0)
+        //{
+        //    GameManager.Instance.PressedKey(KeyIndexInArray.None);
+        //}
+        //else if (tickCount == partyCommandTicks[1] + 2 && GameManager.Instance.PressCount == 1)
+        //{
+        //    GameManager.Instance.PressedKey(KeyIndexInArray.None);
+        //}
+        //else if (tickCount == partyCommandTicks[2] + 2 && GameManager.Instance.PressCount == 2)
+        //{
+        //    GameManager.Instance.PressedKey(KeyIndexInArray.None);
+        //}
+        //else if (tickCount == partyCommandTicks[3] +2 && GameManager.Instance.PressCount == 3)
+        //{
+        //    GameManager.Instance.PressedKey(KeyIndexInArray.None);
+        //}
         #endregion
 
         #region Attack

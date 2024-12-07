@@ -29,15 +29,15 @@ public class PlayerController : MonoBehaviour
             {
                 GameManager.Instance.PressedKey(KeyIndexInArray.DOWN);
             }
-            if (Input.GetKeyDown(KeyCode.RightArrow))
+            else if (Input.GetKeyDown(KeyCode.RightArrow))
             {
                 GameManager.Instance.PressedKey(KeyIndexInArray.RIGHT);
             }
-            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            else if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 GameManager.Instance.PressedKey(KeyIndexInArray.LEFT);
             }
-            if (Input.GetKeyDown(KeyCode.UpArrow))
+            else if (Input.GetKeyDown(KeyCode.UpArrow))
             {
                 GameManager.Instance.PressedKey(KeyIndexInArray.UP);
             }

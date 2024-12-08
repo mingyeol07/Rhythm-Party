@@ -68,34 +68,49 @@ public class TimingCircleSpawner : MonoBehaviour
         StartCoroutine(reduceCircle.Co_StartReduce(currentTime, nextTime));
 
         // 타이밍 원 나타내기
-        yield return StartCoroutine(Co_AppearCanvasGroup());
+        yield return StartCoroutine(Co_AppearTimingCircle());
     }
 
-    private IEnumerator Co_AppearCanvasGroup()
+    private IEnumerator Co_AppearTimingCircle()
     {
-        while (canvasGroup.alpha < 1)
+        Color reduceCircleColor = timingCircleMaterial.color;
+
+        while (timingCircleMaterial.color.a < 0)
         {
-            canvasGroup.alpha = Mathf.Clamp01(canvasGroup.alpha + Time.deltaTime * 5);
-            yield return new WaitForSeconds(0.01f); // 프레임 간격 조정
+            reduceCircleColor.a += Time.deltaTime * 3;
+            timingCircleMaterial.SetColor("_Color", reduceCircleColor);
+
+            yield return null;
         }
-        canvasGroup.alpha = 1;
+
+        reduceCircleColor.a = 1;
+        timingCircleMaterial.SetColor("_Color", reduceCircleColor);
     }
 
-    public IEnumerator Co_VanishCanvasGroup()
+    public IEnumerator Co_VanishTimingCircle()
     {
-        while (canvasGroup.alpha > 0)
+        Color reduceCircleColor = timingCircleMaterial.color;
+
+        while (timingCircleMaterial.color.a > 0)
         {
-            Debug.Log("DDD");
-            canvasGroup.alpha = Mathf.Clamp01(canvasGroup.alpha - Time.deltaTime * 3);
-            yield return new WaitForSeconds(0.01f); // 프레임 간격 조정
+            reduceCircleColor.a -= Time.deltaTime * 3;
+            timingCircleMaterial.SetColor("_Color", reduceCircleColor);
+
+            yield return null;
         }
-        canvasGroup.alpha = 0;
+
+        reduceCircleColor.a = 0;
+        timingCircleMaterial.SetColor("_Color", reduceCircleColor);
     }
 
     public void PressedCommanded(Accuracy accuracy, Skill skill)
     {
         StartCoroutine(reduceCricleQueue.Peek().Co_Vanish());
-        reduceCricleQueue.Peek().ExitCircleQueue();
+        reduceCricleQueue.Dequeue();
+        if (reduceCricleQueue.Count == 0)
+        {
+            StartCoroutine(Co_VanishTimingCircle());
+        }
         character.SkillQueue.Enqueue(skill);
 
         switch(accuracy)

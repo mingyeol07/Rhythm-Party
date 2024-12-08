@@ -12,30 +12,18 @@ public class ReduceCircle : MonoBehaviour
 {
     private Material circleMaterial;
     private Image img;
-    private CanvasGroup canvasGroup;
     private TimingCircleSpawner circleSpawner;
     private readonly string materialColorName = "_Color";
-    private Color reduceCircleColor;
 
     private bool isVanish;
 
     private void Awake()
     {
-        canvasGroup = GetComponentInParent<CanvasGroup>();
         circleSpawner = GetComponentInParent<TimingCircleSpawner>();
 
         img = GetComponent<Image>();
         circleMaterial = new Material(img.material);
         img.material = circleMaterial;
-
-        reduceCircleColor = circleMaterial.color;
-    }
-
-    private void Update()
-    {
-        if (isVanish) return;
-        reduceCircleColor.a = Mathf.Clamp01(canvasGroup.alpha);
-        circleMaterial.SetColor(materialColorName, reduceCircleColor);
     }
 
     public IEnumerator Co_StartReduce(double currentTime, double nextTime)
@@ -87,7 +75,7 @@ public class ReduceCircle : MonoBehaviour
         circleSpawner.ReduceCricleQueue.Dequeue();
         if (circleSpawner.ReduceCricleQueue.Count == 0)
         {
-            StartCoroutine(circleSpawner.Co_VanishCanvasGroup());
+            StartCoroutine(circleSpawner.Co_VanishTimingCircle());
         }
     }
 

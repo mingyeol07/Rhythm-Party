@@ -191,6 +191,12 @@ public class GameManager : MonoBehaviour
             if (pressCount >= sortedPartyAttackSequence.Count)
                 return;
 
+            if (sortedPartyAttackSequence[pressCount][0].CricleSpawner.ReduceCricleQueue.Count == 0)
+            {
+                // 서클이 아무것도 없는경우
+                return;
+            }
+
             int skillIndex = (int)key;
 
             Command(skillIndex);

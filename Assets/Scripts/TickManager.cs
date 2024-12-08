@@ -194,15 +194,15 @@ public class TickManager : MonoBehaviour
         // Mathf.Abs((float)(currentTime - 60d / bpm)) 다음 틱에 얼마나 근접햇는지 4/5
         // Mathf.Abs((float)currentTime) <= tolerance 이전틱에서 얼마나 지나쳤는지 6/5
 
-        if (Mathf.Abs((float)realCurrentTime) <= criticalTolerance || Mathf.Abs((float)(realCurrentTime - realbeat)) <= criticalTolerance)
+        if (Mathf.Abs((float)currentTime) <= criticalTolerance || Mathf.Abs((float)(currentTime - aBeat)) <= criticalTolerance)
         {
             return Accuracy.Critical;
         }
-        else if (Mathf.Abs((float)realCurrentTime) <= strikeTolerance || Mathf.Abs((float)(realCurrentTime - realbeat)) <= strikeTolerance)
+        else if (Mathf.Abs((float)currentTime) <= strikeTolerance || Mathf.Abs((float)(currentTime - aBeat)) <= strikeTolerance)
         {
             return Accuracy.Strike;
         }
-        else if (Mathf.Abs((float)realCurrentTime) <= hitTolerance || Mathf.Abs((float)(realCurrentTime - realbeat)) <= hitTolerance)
+        else if (Mathf.Abs((float)currentTime) <= hitTolerance || Mathf.Abs((float)(currentTime - aBeat)) <= hitTolerance)
         {
             return Accuracy.Hit;
         }

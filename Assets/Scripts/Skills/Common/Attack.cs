@@ -7,5 +7,8 @@ using UnityEngine;
 
 public class Attack : Skill
 {
-
+    public override void Activate()
+    {
+        throw new System.NotImplementedException();
+    }
 }

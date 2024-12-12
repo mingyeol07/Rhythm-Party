@@ -31,6 +31,7 @@ public class GameManager : MonoBehaviour
     private List<List<Character>> sortedPartyGuardSequence = new List<List<Character>>();
 
     [SerializeField] private List<Character> enemyMembers = new List<Character>();
+    public List<Character> EnemyMembers => enemyMembers;
     private List<Enemy> sortedEnemyWithSpeed = new List<Enemy>();
     private List<List<Enemy>> sortedEnemyAttackSequence = new List<List<Enemy>>();
     public event Action EnemyAdditionalAttackChance; // 적 기믹에 의한 추가 공격 기회

@@ -28,20 +28,22 @@ public class Character : MonoBehaviour
     [SerializeField] private Animator animator;
 
     // UIµé
-    [SerializeField] private TMP_Text damageText;
+    [SerializeField] private DamageText damageText;
 
     private void Start()
     {
         skills = new Skill[4];
 
-        skills[0] = new Skill();
-        skills[1] = new Skill();
-        skills[2] = new Skill();
-        skills[3] = new Skill();
+        skills[0] = new ElectricStorm();
+        skills[1] = new ElectricStorm();
+        skills[2] = new ElectricStorm();
+        skills[3] = new ElectricStorm();
     }
 
     public void Damaged(int damage)
     {
+        damageText.TextPlay(damageText.transform, damage);
+
         hp -= damage;
         if (hp < 0)
         {

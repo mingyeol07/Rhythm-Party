@@ -26,6 +26,11 @@ public class ReduceCircle : MonoBehaviour
         img.material = circleMaterial;
     }
 
+    private void Start()
+    {
+        StartCoroutine(Co_Appear());
+    }
+
     public IEnumerator Co_StartReduce(double currentTime, double nextTime)
     {
         float startRadius = 0.5f;
@@ -45,6 +50,22 @@ public class ReduceCircle : MonoBehaviour
 
         yield return StartCoroutine(Co_Vanish());
         ExitCircleQueue();
+    }
+
+    public IEnumerator Co_Appear()
+    {
+        Color reduceCircleColor = circleMaterial.color;
+
+        while (circleMaterial.color.a < 0)
+        {
+            reduceCircleColor.a += Time.deltaTime * 3;
+            circleMaterial.SetColor(materialColorName, reduceCircleColor);
+
+            yield return null;
+        }
+
+        reduceCircleColor.a = 1;
+        circleMaterial.SetColor(materialColorName, reduceCircleColor);
     }
 
     public IEnumerator Co_Vanish()
@@ -75,7 +96,7 @@ public class ReduceCircle : MonoBehaviour
         circleSpawner.ReduceCricleQueue.Dequeue();
         if (circleSpawner.ReduceCricleQueue.Count == 0)
         {
-            StartCoroutine(circleSpawner.Co_VanishTimingCircle());
+            //StartCoroutine(circleSpawner.Co_Vanish);
         }
     }
 

@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
+using UnityEditor.PackageManager;
+
 
 
 // # Unity
@@ -15,35 +17,41 @@ public class GameManager : MonoBehaviour
 
     [Header("Managers")]
     [SerializeField] private TickManager tickManager;
+    private float zoomInCamCenter = 1.7f;
 
-    [SerializeField] private List<Character> partyMembers = new List<Character>();
-    private List<Character> sortedPartyWithSpeed = new List<Character>();
-    private List<List<Character>> sortedPartyAttackSequence = new List<List<Character>>();
-    public event Action ItemAdditionalAttackChance; // 아이템에 의한 추가 공격 기회
-    // 캐릭터는 공격 기회를 가진다. 공격 기회는 파티에서의 스피드를 비교하여 정해지며 모두에게 무조건 한번은 주어진다.
-    // 만약 아이템이나 능력 중, "1번째 리듬에 공격 기회 추가"라는 아이템이 있다면
-    //  한 박자에 동시에 커맨드를 입력해야하는? or 동료끼리의 시너지 공격이 가능하다.
-    // 그렇기에 한 박자에 여러 캐릭터가 공격하는 시스템을 넣고 싶다!! List안에 Queue를 모두 꺼내어 박자에 투입!!
+    #region Party
+    [Header("Party")]
+    [SerializeField] private List<Character> partyMembers = new List<Character>(); // 파티멤버
+    public List<Character> PartyMembers => partyMembers;
 
-    // 이걸 정하는 기준..? =>
-    // 1. 스피드가 높은 순서로 일단 리스트의 0,1,2,3에 캐릭터별로 공격 기회를 넣는다
-    // 2. 캐릭터의 아이템이 자체적으로 Action에 함수를 전달, Action을 발동하여 리스트에 캐릭터 공격 기회 추가
+    private List<Character> sortedPartyAttackSequence = new List<Character>();
     private List<List<Character>> sortedPartyGuardSequence = new List<List<Character>>();
 
+    private Queue<Skill> partyAttackCommandQueue = new Queue<Skill>();
+    public Queue<Skill> PartyAttackCommandQueue => partyAttackCommandQueue;
+
+    private int previousZoomInPartyCharacterIndex;
+
+    [Header("Enemy")]
     [SerializeField] private List<Character> enemyMembers = new List<Character>();
     public List<Character> EnemyMembers => enemyMembers;
-    private List<Enemy> sortedEnemyWithSpeed = new List<Enemy>();
-    private List<List<Enemy>> sortedEnemyAttackSequence = new List<List<Enemy>>();
-    public event Action EnemyAdditionalAttackChance; // 적 기믹에 의한 추가 공격 기회
+
+    private List<List<Character>> sortedEnemyAttackSequence = new List<List<Character>>();
+
+    private int[] previousZoomInEnemyCharactersIndex;
+    #endregion
 
     [SerializeField] private Animator bounceAnimator;
 
     private int pressCount;
     public int PressCount => pressCount;
 
+    private Camera mainCam;
+
     private void Awake()
     {
         Instance = this;
+        mainCam = Camera.main;
     }
 
     private void Start()
@@ -64,6 +72,41 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void ZoomInCharacter(int partyCharIndex, int[] enemyCharIndex, bool isParty = false)
+    {
+        previousZoomInPartyCharacterIndex = partyCharIndex;
+        previousZoomInEnemyCharactersIndex = enemyCharIndex;
+
+        StartCoroutine(sortedPartyAttackSequence[partyCharIndex].MoveToCameraFront(-zoomInCamCenter));
+
+        if(enemyCharIndex.Length > 2)
+        {
+            zoomInCamCenter = 1;
+        }
+        else
+        {
+            zoomInCamCenter = 1.7f;
+        }
+
+        for (int i = 0; i < enemyCharIndex.Length; i++)
+        {
+            StartCoroutine(enemyMembers[enemyCharIndex[i]].MoveToCameraFront(zoomInCamCenter + i * 1));
+        }
+
+        zoomInCamCenter = 1.7f;
+    }
+
+    public void ZoomOutCharacter()
+    {
+        if (previousZoomInPartyCharacterIndex == 0) return;
+
+        StartCoroutine(sortedPartyAttackSequence[previousZoomInPartyCharacterIndex].ReturnToInPlace());
+        for (int i = 0; i < previousZoomInEnemyCharactersIndex.Length; i++)
+        {
+            StartCoroutine(enemyMembers[previousZoomInEnemyCharactersIndex[i]].ReturnToInPlace());
+        }
+    }
+
     #region Party
     public void SortPartyMember()
     {
@@ -71,35 +114,23 @@ public class GameManager : MonoBehaviour
         sortedPartyAttackSequence.Clear();
 
         // 스피드 순서대로 정렬된 파티
-        sortedPartyWithSpeed = new List<Character>(partyMembers);
-        sortedPartyWithSpeed.Sort((a, b) => b.Speed.CompareTo(a.Speed));
+        sortedPartyAttackSequence = new List<Character>(partyMembers);
+        sortedPartyAttackSequence.Sort((a, b) => b.Speed.CompareTo(a.Speed));
+    }
 
-        for (int i=0; i < 4; i++)
+    public void SetPartyCommandList()
+    {
+        for(int i =0; i < sortedPartyAttackSequence.Count; i++)
         {
-            List<Character> characterList = new List<Character> { sortedPartyWithSpeed[i] };
-            sortedPartyAttackSequence.Add(characterList);
-        }
-
-        // 아이템에 의한 공격 기회 추가
-        EnemyAdditionalAttackChance?.Invoke();
-        EnemyAdditionalAttackChance = null;
-
-        Character character = partyMembers[3];
-
-        for (int i = 0; i < 4; i++)
-        {
-            sortedPartyAttackSequence[i].Add(character);
+            partyAttackCommandQueue.Enqueue(sortedPartyAttackSequence[i].NextSkill);
         }
     }
 
-    public void PlayPartyTimingCircle(int index, double startTime, double endTime)
+    public void PlayPartyTimingCircle(int index, double startTime, double endTime, Arrow arrow = Arrow.Up)
     {
         if (index >= sortedPartyAttackSequence.Count) return;
 
-        foreach(Character character in sortedPartyAttackSequence[index])
-        {
-            StartCoroutine(character.CricleSpawner.Co_PlayReduceCircle(startTime, endTime, false));
-        }
+        sortedPartyAttackSequence[index].CricleSpawner.SpawnReduceCircle(startTime, endTime, false, arrow);
     }
     public void PlayPartyGuardCircle(int index, double startTime, double endTime)
     {
@@ -107,7 +138,7 @@ public class GameManager : MonoBehaviour
 
         foreach (Character character in sortedPartyGuardSequence[index])
         {
-            StartCoroutine(character.CricleSpawner.Co_PlayReduceCircle(startTime, endTime, true));
+            sortedPartyAttackSequence[index].CricleSpawner.SpawnReduceCircle(startTime, endTime, true);
         }
     }
 
@@ -120,10 +151,7 @@ public class GameManager : MonoBehaviour
     }
     public void AttackPartyMember(int index)
     {
-        for(int i=0; i < sortedPartyAttackSequence[index].Count;i++)
-        {
-            sortedPartyAttackSequence[index][i].Attack();
-        }
+        sortedPartyAttackSequence[index].Attack();
     }
     #endregion
 
@@ -172,31 +200,16 @@ public class GameManager : MonoBehaviour
     #endregion Enemy
 
     #region Input
-    public void PressedKey(KeyIndexInArray key)
+    public void PressedKey(Arrow key)
     {
         if(tickManager.TickCount > 16)
         {
-            if (pressCount >= sortedPartyGuardSequence.Count) 
-                return;
 
-            if (sortedPartyGuardSequence[pressCount][0].CricleSpawner.ReduceCricleQueue.Count == 0)
-            {
-                // 서클이 아무것도 없는경우
-                return;
-            }
-
-            Guard();
         }
         else
         {
             if (pressCount >= sortedPartyAttackSequence.Count)
                 return;
-
-            if (sortedPartyAttackSequence[pressCount][0].CricleSpawner.ReduceCricleQueue.Count == 0)
-            {
-                // 서클이 아무것도 없는경우
-                return;
-            }
 
             int skillIndex = (int)key;
 
@@ -208,22 +221,14 @@ public class GameManager : MonoBehaviour
 
     private void Command(int skillIndex)
     {
-        for (int i = 0; i < sortedPartyAttackSequence[pressCount].Count; i++)
-        {
-            Character member = sortedPartyAttackSequence[pressCount][i];
-            Accuracy accuracy = tickManager.GetAccuracy(9 + (2 * pressCount));
-            member?.Commanded(accuracy, skillIndex);
-        }
+        Character member = sortedPartyAttackSequence[pressCount];
+        Accuracy accuracy = tickManager.GetAccuracy(9 + (2 * pressCount));
+        member?.Commanded(accuracy, skillIndex);
     }
 
     private void Guard()
     {
-        for (int i = 0; i < sortedPartyGuardSequence[pressCount].Count; i++)
-        {
-            Character member = sortedPartyAttackSequence[pressCount][i];
-            Accuracy accuracy = tickManager.GetAccuracy(9 + (2 * pressCount));
-            //member?.Guard(accuracy);
-        }
+
     }
     #endregion
 }

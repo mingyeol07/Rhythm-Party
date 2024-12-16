@@ -22,14 +22,12 @@ public class TimingCircleSpawner : MonoBehaviour
     [Header("ReduceCircle")]
     [SerializeField] private GameObject reduceCirclePrefab;
     [SerializeField] private Transform reduceCircleParent;
-    
+    [SerializeField] private GameObject timingCirclePrefab;
+    [SerializeField] private Transform timingCircleParent;
+
     // 커맨드로 입력해야할 줄어드는 서클들이 차례대로 들어왔다가 나가는 큐
     private Queue<ReduceCircle> reduceCricleQueue = new Queue<ReduceCircle>();
     public Queue<ReduceCircle> ReduceCricleQueue => reduceCricleQueue;
-
-    [Header("TimingCircle")]
-    [SerializeField] private Image img_timingCircle;
-    private Material timingCircleMaterial;
 
     [Header("UI")]
     [SerializeField] private TMP_Text accuracyText;
@@ -39,25 +37,34 @@ public class TimingCircleSpawner : MonoBehaviour
     {
         canvasGroup = GetComponent<CanvasGroup>();
         character = GetComponentInParent<Character>();
-
-        // img_timingCircle의 머티리얼은 하나만 인스턴스화하여 재사용
-        timingCircleMaterial = new Material(img_timingCircle.material);
-        img_timingCircle.material = timingCircleMaterial;
     }
 
     private void OnDestroy()
     {
-        // 씬 전환 시 재활용 머티리얼 메모리 해제
-        if (timingCircleMaterial != null)
-        {
-            Destroy(timingCircleMaterial);
-        }
     }
 
-    public IEnumerator Co_PlayReduceCircle(double currentTime, double nextTime, bool isGuardTiming = false)
+    public void SpawnReduceCircle(double currentTime, double nextTime, bool isGuardTiming = false, Arrow arrow = Arrow.Up)
     {
+        GameObject timingCricle = Instantiate(timingCirclePrefab, timingCircleParent);
+        Material timingCircleMaterial = timingCricle.GetComponent<Image>().material;
         // 가드타이밍이라면 timingCircle의 색깔은 파랑, 아니라면 빨강
         timingCircleMaterial.color = isGuardTiming ? Color.cyan : Color.red;
+
+        switch(arrow)
+        {
+            case Arrow.Up:
+                transform.localPosition = Vector3.up * 2;
+                break;
+            case Arrow.Down:
+                transform.localPosition = Vector3.down * 2;
+                break;
+            case Arrow.Left:
+                transform.localPosition = Vector3.left * 2;
+                break;
+            case Arrow.Right:
+                transform.localPosition = Vector3.right * 2;
+                break;
+        }
 
         // 줄어드는 원 생성
         GameObject circle = Instantiate(reduceCirclePrefab, reduceCircleParent);
@@ -66,52 +73,13 @@ public class TimingCircleSpawner : MonoBehaviour
 
         // 원 줄어들기 코루틴
         StartCoroutine(reduceCircle.Co_StartReduce(currentTime, nextTime));
-
-        // 타이밍 원 나타내기
-        yield return StartCoroutine(Co_AppearTimingCircle());
-    }
-
-    private IEnumerator Co_AppearTimingCircle()
-    {
-        Color reduceCircleColor = timingCircleMaterial.color;
-
-        while (timingCircleMaterial.color.a < 0)
-        {
-            reduceCircleColor.a += Time.deltaTime * 3;
-            timingCircleMaterial.SetColor("_Color", reduceCircleColor);
-
-            yield return null;
-        }
-
-        reduceCircleColor.a = 1;
-        timingCircleMaterial.SetColor("_Color", reduceCircleColor);
-    }
-
-    public IEnumerator Co_VanishTimingCircle()
-    {
-        Color reduceCircleColor = timingCircleMaterial.color;
-
-        while (timingCircleMaterial.color.a > 0)
-        {
-            reduceCircleColor.a -= Time.deltaTime * 3;
-            timingCircleMaterial.SetColor("_Color", reduceCircleColor);
-
-            yield return null;
-        }
-
-        reduceCircleColor.a = 0;
-        timingCircleMaterial.SetColor("_Color", reduceCircleColor);
     }
 
     public void PressedCommanded(Accuracy accuracy, Skill skill)
     {
         StartCoroutine(reduceCricleQueue.Peek().Co_Vanish());
         reduceCricleQueue.Dequeue();
-        if (reduceCricleQueue.Count == 0)
-        {
-            StartCoroutine(Co_VanishTimingCircle());
-        }
-        character.SkillQueue.Enqueue(skill);
+        character.SetNextSkill(skill);
 
         switch(accuracy)
         {

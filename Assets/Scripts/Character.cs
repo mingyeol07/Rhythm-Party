@@ -21,8 +21,8 @@ public class Character : MonoBehaviour
     public TimingCircleSpawner CricleSpawner => circleSpawner;
 
     // 입력된 커맨드에 따라 스킬들이 순서대로 저장되는 큐
-    private Queue<Skill> skillQueue = new Queue<Skill>();
-    public Queue<Skill> SkillQueue => skillQueue;
+    private Skill nextSkill;
+    public Skill NextSkill => nextSkill;
 
     // 컴포넌트들
     [SerializeField] private Animator animator;
@@ -30,14 +30,16 @@ public class Character : MonoBehaviour
     // UI들
     [SerializeField] private DamageText damageText;
 
+    private Vector3 returnPosition;
+
     private void Start()
     {
         skills = new Skill[4];
 
-        skills[0] = new ElectricStorm();
-        skills[1] = new ElectricStorm();
-        skills[2] = new ElectricStorm();
-        skills[3] = new ElectricStorm();
+        skills[0] = new ElectricStorm(this);
+        skills[1] = new ElectricStorm(this);
+        skills[2] = new ElectricStorm(this);
+        skills[3] = new ElectricStorm(this);
     }
 
     public void Damaged(int damage)
@@ -56,9 +58,14 @@ public class Character : MonoBehaviour
 
     }
 
+    public void SetNextSkill(Skill nextSkill)
+    {
+        this.nextSkill = nextSkill;
+    }
+
     public void Attack()
     {
-        if(skillQueue.Count == 0)
+        if(nextSkill == null)
         {
             // 스킬 실패 애니메이션
             return;
@@ -66,7 +73,8 @@ public class Character : MonoBehaviour
 
         animator.SetBool("Attacked", true);
 
-        Skill skill = skillQueue.Dequeue();
+        Skill skill = nextSkill;
+        nextSkill = null;
 
         skill.Activate();
     }
@@ -90,5 +98,42 @@ public class Character : MonoBehaviour
         animator.SetBool("Commanded", true);
         circleSpawner.PressedCommanded(accuracy, skills[skillIndex]);
         // 스킬 예약
+    }
+
+    public IEnumerator MoveToCameraFront(float x)
+    {
+        returnPosition = transform.position;
+
+        Vector3 endPos = new Vector3(x, 0.5f, -10f);
+        float maxTime = 0.5f;
+        float time = 0;
+
+        while(time < maxTime)
+        {
+            time += Time.deltaTime;
+            float t = time / maxTime;
+            transform.position = Vector3.Lerp(returnPosition, endPos, t);
+            yield return null;
+        }
+
+        transform.position = endPos;
+    }
+
+    public IEnumerator ReturnToInPlace()
+    {
+        Vector3 nowPos = transform.position;
+
+        float maxTime = 0.5f;
+        float time = 0;
+
+        while (time < maxTime)
+        {
+            time += Time.deltaTime;
+            float t = time / maxTime;
+            transform.position = Vector3.Lerp(nowPos, returnPosition, t);
+            yield return null;
+        }
+
+        transform.position = returnPosition;
     }
 }

@@ -19,7 +19,6 @@ public class ElectricStorm : Skill
 
     public override void SetCommand()
     {
-        Debug.Log("DD");
         skillCommandList = new Arrow[5];
         skillCommandList[0] = Arrow.Down;
         skillCommandList[1] = Arrow.Up;

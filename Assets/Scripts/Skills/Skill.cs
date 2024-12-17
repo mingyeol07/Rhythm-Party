@@ -11,6 +11,8 @@ public abstract class Skill : MonoBehaviour
     protected int[] targetIndex; // 0, 1, 2, 3?
     protected Arrow[] skillCommandList;
     protected Character caster;
+    protected bool isPartyTarget = false;
+    public Character Caster => caster;
 
     /// <summary>
     /// 스킬 구현
@@ -28,7 +30,7 @@ public abstract class Skill : MonoBehaviour
     public void GetTargetIndex(out int[] arr, out bool isParty)
     {
         arr = targetIndex;
-        isParty = false;
+        isParty = isPartyTarget;
     }
     public Skill(Character caster)
     {

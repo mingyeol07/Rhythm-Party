@@ -153,7 +153,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0
-  circleSpawner: {fileID: 7279273090031071972}
+  circleManager: {fileID: 7279273090031071972}
   animator: {fileID: 2380415827578659725}
   damageText: {fileID: 5842647305409777152}
 --- !u!1001 &2380415826478826921

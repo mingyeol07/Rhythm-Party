@@ -17,10 +17,9 @@ public class Character : MonoBehaviour
     public int Speed => speed;
 
     // 공격 기회를 알려주는 써클 
-    [SerializeField] private TimingCircleSpawner circleSpawner;
-    public TimingCircleSpawner CricleSpawner => circleSpawner;
+    [SerializeField] private CircleManager circleManager;
+    public CircleManager CircleManager => circleManager;
 
-    // 입력된 커맨드에 따라 스킬들이 순서대로 저장되는 큐
     private Skill nextSkill;
     public Skill NextSkill => nextSkill;
 
@@ -58,11 +57,6 @@ public class Character : MonoBehaviour
 
     }
 
-    public void SetNextSkill(Skill nextSkill)
-    {
-        this.nextSkill = nextSkill;
-    }
-
     public void Attack()
     {
         if(nextSkill == null)
@@ -93,11 +87,17 @@ public class Character : MonoBehaviour
         animator.SetTrigger("Bounce");
     }
 
-    public void Commanded(Accuracy accuracy, int skillIndex)
+    public void AttackCommand(Accuracy accuracy, Arrow arrow)
+    {
+        circleManager.PressedAttack(accuracy, arrow);
+    }
+
+    public void SkillCommand(Accuracy accuracy, int skillIndex)
     {
         animator.SetBool("Commanded", true);
-        circleSpawner.PressedCommanded(accuracy, skills[skillIndex]);
-        // 스킬 예약
+        circleManager.PressedCommand(accuracy);
+
+        nextSkill = skills[skillIndex];
     }
 
     public IEnumerator MoveToCameraFront(float x)

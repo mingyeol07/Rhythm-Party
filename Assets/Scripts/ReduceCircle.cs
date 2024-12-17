@@ -11,24 +11,24 @@ using UnityEngine.UI;
 public class ReduceCircle : MonoBehaviour
 {
     private Material circleMaterial;
+    public Material CircleMaterial => circleMaterial;
     private Image img;
-    private TimingCircleSpawner circleSpawner;
     private readonly string materialColorName = "_Color";
 
     private bool isVanish;
 
+    private CircleSpawner mySpawner;
+
     private void Awake()
     {
-        circleSpawner = GetComponentInParent<TimingCircleSpawner>();
-
         img = GetComponent<Image>();
         circleMaterial = new Material(img.material);
         img.material = circleMaterial;
     }
 
-    private void Start()
+    public void SetSpawner(CircleSpawner spawner)
     {
-        StartCoroutine(Co_Appear());
+        mySpawner = spawner;
     }
 
     public IEnumerator Co_StartReduce(double currentTime, double nextTime)
@@ -48,6 +48,10 @@ public class ReduceCircle : MonoBehaviour
             yield return null;
         }
 
+        if (mySpawner.ReduceCircleQueue.Count <= 1)
+        {
+            mySpawner.VanishTimingCircle();
+        }
         yield return StartCoroutine(Co_Vanish());
         ExitCircleQueue();
     }
@@ -78,7 +82,7 @@ public class ReduceCircle : MonoBehaviour
 
         while (circleMaterial.color.a > 0)
         {
-            reduceCircleColor.a -= Time.deltaTime * 3;
+            reduceCircleColor.a -= Time.deltaTime * 2;
             circleMaterial.SetColor(materialColorName, reduceCircleColor);
 
             yield return null;
@@ -86,17 +90,14 @@ public class ReduceCircle : MonoBehaviour
 
         reduceCircleColor.a = 0;
         circleMaterial.SetColor(materialColorName, reduceCircleColor);
-        Destroy(this.gameObject);
     }
 
     public void ExitCircleQueue()
     {
-        if (isVanish) return;
-
-        circleSpawner.ReduceCricleQueue.Dequeue();
-        if (circleSpawner.ReduceCricleQueue.Count == 0)
+        if(mySpawner.ReduceCircleQueue.Count > 0)
         {
-            //StartCoroutine(circleSpawner.Co_Vanish);
+            mySpawner.ReduceCircleQueue.Dequeue();
+            Destroy(this.gameObject);
         }
     }
 

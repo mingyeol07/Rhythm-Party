@@ -41,7 +41,8 @@ public class TickManager : MonoBehaviour
     // 원
     private int circleWaitTick = 2; // 원을 때리기 전이 몇 틱 전인지 정의
     private int realCircleWaitTick = 4;
-    private double circleWaitTime; // 원을 보여주기 전 시점과 타이밍의 차이를 계산
+    private double circleWaitTimeTwo; // 원을 보여주기 전 시점과 타이밍의 차이를 계산
+    private double circleWaitTimeOne; 
     private int attackWaitTime = 8; // 박자를 누르고 나서 얼마나 기다리는지의 값
 
     private double enemyCircleWaitTime;
@@ -79,7 +80,8 @@ public class TickManager : MonoBehaviour
         aBeat = (60d / bpm);
         realbeat = (30d / bpm); // 반박자를 세기위함
 
-        circleWaitTime = aBeat * circleWaitTick;
+        circleWaitTimeTwo = aBeat * circleWaitTick;
+        circleWaitTimeOne = aBeat * 1;
         enemyCircleWaitTime = aBeat;
     }
 
@@ -137,22 +139,22 @@ public class TickManager : MonoBehaviour
         if(tickCount == 5)
         {
             tickDict.Add(5 + realCircleWaitTick, true);
-            GameManager.Instance.PlayPartyTimingCircle(0, realCurrentTime, circleWaitTime, Arrow.Up);
+            GameManager.Instance.PlayPartyTimingCircle(0, realCurrentTime, circleWaitTimeTwo, Arrow.Up);
         }
         else if (tickCount == 7)
         {
             tickDict.Add(7 + realCircleWaitTick, true);
-            GameManager.Instance.PlayPartyTimingCircle(1, realCurrentTime, circleWaitTime, Arrow.Up);
+            GameManager.Instance.PlayPartyTimingCircle(1, realCurrentTime, circleWaitTimeTwo, Arrow.Up);
         }
         else if (tickCount == 9)
         {
             tickDict.Add(9 + realCircleWaitTick, true);
-            GameManager.Instance.PlayPartyTimingCircle(2, realCurrentTime, circleWaitTime, Arrow.Up);
+            GameManager.Instance.PlayPartyTimingCircle(2, realCurrentTime, circleWaitTimeTwo, Arrow.Up);
         }
         else if (tickCount == 11)
         {
             tickDict.Add(11 + realCircleWaitTick, true);
-            GameManager.Instance.PlayPartyTimingCircle(3, currentTime, circleWaitTime, Arrow.Up);
+            GameManager.Instance.PlayPartyTimingCircle(3, currentTime, circleWaitTimeTwo, Arrow.Up);
         }
 
         if(turnState == TurnState.PlayerAttacking)
@@ -239,7 +241,7 @@ public class TickManager : MonoBehaviour
             GameManager.Instance.ZoomInCharacter(skill);
             
             changeSkillCasterFlag = true;
-            attackCommandWaitCount = 3;
+            attackCommandWaitCount = 4;
         }
 
         if(attackCommandWaitCount > 0)
@@ -251,7 +253,7 @@ public class TickManager : MonoBehaviour
         Arrow arrow = arrowQueue.Dequeue();
         if(arrow != Arrow.None)
         {
-            GameManager.Instance.PlayPartyTimingCircle(attackCharacterIndexCount, realCurrentTime, circleWaitTime, arrow);
+            GameManager.Instance.PlayPartyTimingCircle(attackCharacterIndexCount, realCurrentTime, circleWaitTimeOne, arrow);
             tickDict.Add(tickCount + realCircleWaitTick, true);
         }
 

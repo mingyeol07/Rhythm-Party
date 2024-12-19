@@ -58,6 +58,8 @@ public class ReduceCircle : MonoBehaviour
 
     public IEnumerator Co_Appear()
     {
+        isVanish = false;
+
         Color reduceCircleColor = circleMaterial.color;
 
         while (circleMaterial.color.a < 0)

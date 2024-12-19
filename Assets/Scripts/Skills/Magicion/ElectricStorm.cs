@@ -19,12 +19,14 @@ public class ElectricStorm : Skill
 
     public override void SetCommand()
     {
-        skillCommandList = new Arrow[5];
+        skillCommandList = new Arrow[7];
         skillCommandList[0] = Arrow.Down;
-        skillCommandList[1] = Arrow.Up;
+        skillCommandList[1] = Arrow.None;
         skillCommandList[2] = Arrow.Left;
         skillCommandList[3] = Arrow.None;
         skillCommandList[4] = Arrow.Right;
+        skillCommandList[5] = Arrow.None;
+        skillCommandList[6] = Arrow.Up;
 
         targetIndex = new int[4];
         targetIndex[0] = 0;

@@ -152,11 +152,11 @@ public class GameManager : MonoBehaviour
         sortedPartyAttackSequence.Sort((a, b) => b.Speed.CompareTo(a.Speed));
     }
 
-    public void PlayPartyTimingCircle(int sortedPartyIndex, double startTime, double endTime, Arrow arrow, int targetTick)
+    public void PlayPartyTimingCircle(int sortedPartyIndex, double startTime, double endTime, Arrow arrow, CircleType type, int targetTick)
     {
         if (sortedPartyIndex >= sortedPartyAttackSequence.Count) return;
 
-        sortedPartyAttackSequence[sortedPartyIndex].CircleManager.SpawnReduceCircle(startTime, endTime, arrow, false, targetTick);
+        sortedPartyAttackSequence[sortedPartyIndex].CircleManager.SpawnReduceCircle(startTime, endTime, arrow, type, targetTick);
     }
 
     public void PlayPartyReBounce()
@@ -165,10 +165,6 @@ public class GameManager : MonoBehaviour
         {
             partyMembers[i].ReBounce();
         }
-    }
-    public void AttackPartyMember(int index)
-    {
-        sortedPartyAttackSequence[index].Attack();
     }
     #endregion
 
@@ -225,8 +221,17 @@ public class GameManager : MonoBehaviour
         if (tickManager.TickCount > 16 && nowSkillCaster != null)
         {
             member = nowSkillCaster;
-            accuracy = tickManager.GetAccuracy(member.GetFirstCircleTick(arrow));
-            member.AttackCommand(accuracy, arrow);
+            ReduceCircle circle = member.CircleManager.SkillCircleQueue.Peek();
+            if(arrow != circle.ArrowType)
+            {
+                accuracy = Accuracy.Miss;
+            }
+            else
+            {
+                accuracy = tickManager.GetAccuracy(circle.TargetTick);
+            }
+
+            member.AttackCommand(accuracy, circle.ArrowType);
         }
         else
         {
@@ -235,7 +240,7 @@ public class GameManager : MonoBehaviour
             int skillIndex = (int)arrow;
 
             member = sortedPartyAttackSequence[pressCount];
-            accuracy = tickManager.GetAccuracy(member.GetFirstCircleTick(Arrow.Up));
+            accuracy = tickManager.GetAccuracy(member.GetFirstCircleInSpawner(Arrow.Up).TargetTick);
             member.SkillCommand(accuracy, skillIndex);
 
             pressCount++;

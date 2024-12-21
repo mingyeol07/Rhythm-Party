@@ -58,8 +58,6 @@ public class TickManager : MonoBehaviour
     // 25, 27, 29, 31, 적 커맨드마디? ~
     // 33, 35, 37, 39 적 공격마디~
 
-    private int[] partyCommandTicks = { 9, 11, 13, 15 }; // 파티가 커맨드를 입력하는 시점(틱)
-
     // 턴
     private TurnState turnState = TurnState.None;
     private bool changeSkillCasterFlag = false;
@@ -74,7 +72,7 @@ public class TickManager : MonoBehaviour
     private int attackCommandAfterWaitCount;
 
     private Queue<Arrow> arrowQueue = new Queue<Arrow>();
-    private Dictionary<int, bool> tickDict = new Dictionary<int, bool>();
+    private Dictionary<int, Arrow> tickDict = new Dictionary<int, Arrow>();
 
     private void Start()
     {
@@ -107,26 +105,6 @@ public class TickManager : MonoBehaviour
 
     private void CalculationTurn()
     {
-        //if (tickCount == enemyAttackTicks[enemyAttackTicks.Length - 1])
-        //{
-        //    // 이전 틱이 모든 틱의 마지막 틱이었다면?
-        //    turnState = TurnState.None;
-        //    GameManager.Instance.SortPartyMember();
-        //    tickCount = 0;
-        //}
-        //else if (tickCount == partyCommandTicks[partyCommandTicks.Length - 1] + attackWaitTime) // 파티의 어택 틱들이 모두 끝났다면
-        //{
-        //    // 이전 틱이 마지막 공격 틱이었다면?
-        //    // 적의 공격을 받을 준비
-        //    turnState = TurnState.EnemyCommanding;
-        //    //GameManager.Instance.SortEnemyMember(ref enemyAttackTicks);
-        //}
-        //if(tickCount == 24)
-        //{
-        //    // 적의 공격을 준비함
-        //    GameManager.Instance.PlayPartyReBounce();
-        //    GameManager.Instance.SortEnemyMember(ref enemyAttackTicks);
-        //}
         if (tickCount == 16)
         {
             turnState = TurnState.PlayerAttacking;
@@ -135,93 +113,32 @@ public class TickManager : MonoBehaviour
 
         tickCount++;
 
-        #region Command
         // 플레이어의 어택커맨드 타이밍인 5,6,7,8의 1초 전에 미리 서클애니메이션 진행
         if(tickCount == 5)
         {
-            tickDict.Add(tickCount + circleWaitTickOne, true);
-            GameManager.Instance.PlayPartyTimingCircle(0, realCurrentTime, circleWaitTimeOne, Arrow.Up, tickCount + circleWaitTickOne);
+            tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
+            GameManager.Instance.PlayPartyTimingCircle(0, realCurrentTime, circleWaitTimeOne, Arrow.Up, CircleType.Command, tickCount + circleWaitTickOne);
         }
         if (tickCount == 7)
         {
-            tickDict.Add(tickCount + circleWaitTickOne, true);
-            GameManager.Instance.PlayPartyTimingCircle(1, realCurrentTime, circleWaitTimeOne, Arrow.Up, tickCount + circleWaitTickOne);
+            tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
+            GameManager.Instance.PlayPartyTimingCircle(1, realCurrentTime, circleWaitTimeOne, Arrow.Up, CircleType.Command, tickCount + circleWaitTickOne);
         }
         if (tickCount == 9)
         {
-            tickDict.Add(tickCount + circleWaitTickOne, true);
-            GameManager.Instance.PlayPartyTimingCircle(2, realCurrentTime, circleWaitTimeOne, Arrow.Up, tickCount + circleWaitTickOne);
+            tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
+            GameManager.Instance.PlayPartyTimingCircle(2, realCurrentTime, circleWaitTimeOne, Arrow.Up, CircleType.Command, tickCount + circleWaitTickOne);
         }
         if (tickCount == 11)
         {
-            tickDict.Add(tickCount + circleWaitTickOne, true);
-            GameManager.Instance.PlayPartyTimingCircle(3, realCurrentTime, circleWaitTimeOne, Arrow.Up, tickCount + circleWaitTickOne);
+            tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
+            GameManager.Instance.PlayPartyTimingCircle(3, realCurrentTime, circleWaitTimeOne, Arrow.Up, CircleType.Command, tickCount + circleWaitTickOne);
         }
 
         if(turnState == TurnState.PlayerAttacking)
         {
             PartyCommandAttack();
         }
-
-        // 타이밍을 늦어서 못누른채 반박자가 넘어간다면 Miss가 떠야함
-        //if (tickCount == partyCommandTicks[0] +2 && GameManager.Instance.PressCount == 0)
-        //{
-        //    GameManager.Instance.PressedKey(KeyIndexInArray.None);
-        //}
-        //else if (tickCount == partyCommandTicks[1] + 2 && GameManager.Instance.PressCount == 1)
-        //{
-        //    GameManager.Instance.PressedKey(KeyIndexInArray.None);
-        //}
-        //else if (tickCount == partyCommandTicks[2] + 2 && GameManager.Instance.PressCount == 2)
-        //{
-        //    GameManager.Instance.PressedKey(KeyIndexInArray.None);
-        //}
-        //else if (tickCount == partyCommandTicks[3] +2 && GameManager.Instance.PressCount == 3)
-        //{
-        //    GameManager.Instance.PressedKey(KeyIndexInArray.None);
-        //}
-        #endregion
-
-        #region Attack
-        if (tickCount == partyCommandTicks[0] + attackWaitTime)
-        {
-            GameManager.Instance.AttackPartyMember(0);
-        }
-        else if (tickCount == partyCommandTicks[1] + attackWaitTime)
-        {
-            GameManager.Instance.AttackPartyMember(1);
-        }
-        else if (tickCount == partyCommandTicks[2] + attackWaitTime)
-        {
-            GameManager.Instance.AttackPartyMember(2);
-        }
-        else if (tickCount == partyCommandTicks[3] + attackWaitTime)
-        {
-            GameManager.Instance.AttackPartyMember(3);
-        }
-        #endregion
-
-        if(tickCount > 24)
-        {
-            CheckEnemyAttackTick();
-        }
-
-        //if (tickCount == enemyAttackTicks[0] + attackWaitTime)
-        //{
-        //    GameManager.Instance.AttackPartyMember(0);
-        //}
-        //else if (tickCount == partyCommandTicks[1] + attackWaitTime)
-        //{
-        //    GameManager.Instance.AttackPartyMember(1);
-        //}
-        //else if (tickCount == partyCommandTicks[2] + attackWaitTime)
-        //{
-        //    GameManager.Instance.AttackPartyMember(2);
-        //}
-        //else if (tickCount == partyCommandTicks[3] + attackWaitTime)
-        //{
-        //    GameManager.Instance.AttackPartyMember(3);
-        //}
     }
    
     private void PartyCommandAttack()
@@ -265,8 +182,8 @@ public class TickManager : MonoBehaviour
         Arrow arrow = arrowQueue.Dequeue();
         if(arrow != Arrow.None)
         {
-            tickDict.Add(tickCount + circleWaitTickOne, true);
-            GameManager.Instance.PlayPartyTimingCircle(attackCharacterIndexCount, realCurrentTime, circleWaitTimeOne, arrow, tickCount + circleWaitTickOne);
+            tickDict.Add(tickCount + circleWaitTickOne, arrow);
+            GameManager.Instance.PlayPartyTimingCircle(attackCharacterIndexCount, realCurrentTime, circleWaitTimeOne, arrow, CircleType.Attack, tickCount + circleWaitTickOne);
         }
 
         if (arrowQueue.Count == 0)
@@ -285,15 +202,8 @@ public class TickManager : MonoBehaviour
         }
     }
 
-    private void CheckEnemyAttackTick()
-    {
-
-    }
-
     public Accuracy GetAccuracy(int targetTick)
     {
-        Debug.Log(targetTick);
-
         if (!tickDict.ContainsKey(targetTick))
         {
             return Accuracy.Miss;
@@ -322,5 +232,17 @@ public class TickManager : MonoBehaviour
         }
 
         return Accuracy.Miss;
+    }
+
+    public Arrow GetNowArrowInTick(int targetTick)
+    {
+        if (!tickDict.ContainsKey(targetTick))
+        {
+            return Arrow.None;
+        }
+        else
+        {
+            return tickDict[targetTick];
+        }
     }
 }

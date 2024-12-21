@@ -1,11 +1,13 @@
 // # Systems
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
+
 
 // # Unity
 using UnityEngine;
 
-public abstract class Skill : MonoBehaviour
+public abstract class Skill
 {
     protected int damage;
     protected int[] targetIndex; // 0, 1, 2, 3?
@@ -17,7 +19,7 @@ public abstract class Skill : MonoBehaviour
     /// <summary>
     /// 스킬 구현
     /// </summary>
-    public abstract void Activate();
+    public abstract void Activate(int damage);
     public abstract void SetCommand();
 
     public void GetSkillCommandList(ref Queue<Arrow> queue)
@@ -36,5 +38,26 @@ public abstract class Skill : MonoBehaviour
     {
         SetCommand();
         this.caster = caster;
+    }
+    public int DamageCalculation(Accuracy accuracy)
+    {
+        int dam = damage;
+
+        switch (accuracy)
+        {
+            case Accuracy.Critical:
+                dam = damage + damage / 2;
+                break;
+            case Accuracy.Strike:
+                break;
+            case Accuracy.Hit:
+                dam /= 2;
+                break;
+            case Accuracy.Miss:
+                dam = 0;
+                break;
+        }
+
+        return dam;
     }
 }

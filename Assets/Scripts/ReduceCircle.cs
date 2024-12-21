@@ -22,6 +22,9 @@ public class ReduceCircle : MonoBehaviour
     private int targetTick;
     public int TargetTick => targetTick;
 
+    private Arrow arrowType;
+    public Arrow ArrowType => arrowType;
+
     private void Awake()
     {
         img = GetComponent<Image>();
@@ -29,9 +32,11 @@ public class ReduceCircle : MonoBehaviour
         img.material = circleMaterial;
     }
 
-    public void SetSpawner(CircleSpawner spawner)
+    public void Init(CircleSpawner spawner, int tick, Arrow arrow)
     {
         mySpawner = spawner;
+        targetTick = tick;
+        arrowType = arrow;
     }
 
     public IEnumerator Co_StartReduce(double currentTime, double nextTime)
@@ -102,13 +107,9 @@ public class ReduceCircle : MonoBehaviour
         if(mySpawner.ReduceCircleQueue.Count > 0)
         {
             mySpawner.ReduceCircleQueue.Dequeue();
+            mySpawner.CircleManager.SkillCircleQueue.Dequeue();
             Destroy(this.gameObject);
         }
-    }
-
-    public void SetTargetTick(int tick)
-    {
-        targetTick = tick;
     }
 
     private void OnDestroy()

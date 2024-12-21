@@ -26,6 +26,7 @@ public class Character : MonoBehaviour
 
     // 컴포넌트들
     [SerializeField] private Animator animator;
+    [SerializeField] private Animator bounceAnimator;
 
     // UI들
     [SerializeField] private DamageText damageText;
@@ -33,7 +34,7 @@ public class Character : MonoBehaviour
     private Vector3 returnPosition;
     private bool isMoveToCam;
 
-    private void Start()
+    private void Awake()
     {
         skills = new Skill[4];
 
@@ -41,7 +42,10 @@ public class Character : MonoBehaviour
         skills[1] = new ElectricStorm(this);
         skills[2] = new ElectricStorm(this);
         skills[3] = new ElectricStorm(this);
+    }
 
+    private void Start()
+    {
         returnPosition = transform.position;
     }
 
@@ -61,54 +65,48 @@ public class Character : MonoBehaviour
 
     }
 
-    public void Attack()
+    public void Attack(Accuracy accuracy)
     {
         if(nextSkill == null)
         {
-            // 스킬 실패 애니메이션
             return;
         }
 
         animator.SetBool("Attacked", true);
 
-        Skill skill = nextSkill;
-        nextSkill = null;
-
-        skill.Activate();
+        nextSkill.Activate(nextSkill.DamageCalculation(accuracy));
     }
 
     public void BounceAnimation()
     {
-        if (animator.GetBool("Commanded")) return;
-
-        animator.SetTrigger("Bounce");
+        bounceAnimator.SetTrigger("Bounce");
     }
 
     public void ReBounce()
     {
         animator.SetBool("Attacked", false);
         animator.SetBool("Commanded", false);
-        animator.SetTrigger("Bounce");
     }
 
-    public int GetFirstCircleTick(Arrow arrow)
+    public ReduceCircle GetFirstCircleInSpawner(Arrow arrow)
     {
         if(circleManager.GetCircleSpawner(arrow).ReduceCircleQueue.Count > 0)
         {
-            return circleManager.GetCircleSpawner(arrow).ReduceCircleQueue.Peek().TargetTick;
+            return circleManager.GetCircleSpawner(arrow).ReduceCircleQueue.Peek();
         }
 
-        return 0;
+        return null;
     }
 
     public void AttackCommand(Accuracy accuracy, Arrow arrow)
     {
         circleManager.PressedAttackCommand(accuracy, arrow);
+        Attack(accuracy);
     }
 
     public void SkillCommand(Accuracy accuracy, int skillIndex)
     {
-        //animator.SetBool("Commanded", true);
+        animator.SetBool("Commanded", true);
         circleManager.PressedCommand(accuracy);
 
         // 스킬 세팅

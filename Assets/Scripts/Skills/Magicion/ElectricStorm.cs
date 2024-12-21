@@ -9,16 +9,18 @@ public class ElectricStorm : Skill
 {
     public ElectricStorm(Character caster) : base(caster) { }
 
-    public override void Activate()
+    public override void Activate(int damage)
     {
         for(int i = 0; i< GameManager.Instance.EnemyMembers.Count; i++)
         {
-            GameManager.Instance.EnemyMembers[i].Damaged(40);
+            GameManager.Instance.EnemyMembers[i].Damaged(damage);
         }
     }
 
     public override void SetCommand()
     {
+        damage = 40;
+
         skillCommandList = new Arrow[7];
         skillCommandList[0] = Arrow.Down;
         skillCommandList[1] = Arrow.None;

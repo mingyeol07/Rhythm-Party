@@ -27,7 +27,7 @@ public class CircleSpawner : MonoBehaviour
         reduceCircleParent = transform.GetChild(1).transform;
     }
 
-    public void SpawnCircle(double currentTime, double endTime, bool isGuardTiming = false)
+    public void SpawnCircle(double currentTime, double endTime, bool isGuardTiming, int targetTick)
     {
         if(reduceCircleQueue.Count ==0)
         {
@@ -37,6 +37,7 @@ public class CircleSpawner : MonoBehaviour
         // 줄어드는 원 생성
         GameObject circle = Instantiate(reduceCirclePrefab, reduceCircleParent);
         ReduceCircle reduceCircle = circle.GetComponent<ReduceCircle>();
+        reduceCircle.SetTargetTick(targetTick);
         reduceCircleQueue.Enqueue(reduceCircle);
         reduceCircle.SetSpawner(this);
 

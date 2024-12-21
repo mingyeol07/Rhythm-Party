@@ -20,6 +20,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TickManager tickManager;
     private float zoomInCamCenter = 1.7f;
 
+    private Character previousZoomInCaster;
+    private List<Character> previousZoomInTargets = new List<Character>();
+
     #region Party
     [Header("Party")]
     [SerializeField] private List<Character> partyMembers = new List<Character>(); // ÆÄÆ¼¸â¹ö
@@ -37,9 +40,6 @@ public class GameManager : MonoBehaviour
     public List<Character> EnemyMembers => enemyMembers;
 
     private List<List<Character>> sortedEnemyAttackSequence = new List<List<Character>>();
-
-    private Character previousZoomInCaster;
-    private List<Character> previousZoomInTargets = new List<Character>();
     #endregion
 
     [SerializeField] private Animator bounceAnimator;
@@ -75,13 +75,17 @@ public class GameManager : MonoBehaviour
 
     public void ZoomInCharacter(Skill skill)
     {
-        skill.GetTargetIndex(out int[] targetArray, out bool isParty);
-        Character caster = sortedPartyAttackSequence.Find(c => c == skill.Caster);
+        Character caster = skill.Caster;
         previousZoomInCaster = caster;
 
         StartCoroutine(caster.MoveToCameraFront(-zoomInCamCenter));
+    }
 
-        if(targetArray.Length > 2)
+    public void ZoomInTargets(Skill skill)
+    {
+        previousZoomInTargets.Clear();
+        skill.GetTargetIndex(out int[] targetArray, out bool isParty);
+        if (targetArray.Length > 2)
         {
             zoomInCamCenter = 1;
         }
@@ -111,15 +115,15 @@ public class GameManager : MonoBehaviour
     public void ZoomOutCharacter()
     {
         if (previousZoomInCaster == null) return;
-
         StartCoroutine(previousZoomInCaster.ReturnToInPlace());
-        previousZoomInCaster = null;
+    }
 
+    public void ZoomOutTargets()
+    {
         for (int i = 0; i < previousZoomInTargets.Count; i++)
         {
             StartCoroutine(previousZoomInTargets[i].ReturnToInPlace());
         }
-        previousZoomInTargets.Clear();
     }
 
     #region Party
@@ -148,20 +152,11 @@ public class GameManager : MonoBehaviour
         sortedPartyAttackSequence.Sort((a, b) => b.Speed.CompareTo(a.Speed));
     }
 
-    public void PlayPartyTimingCircle(int sortedPartyIndex, double startTime, double endTime, Arrow arrow)
+    public void PlayPartyTimingCircle(int sortedPartyIndex, double startTime, double endTime, Arrow arrow, int targetTick)
     {
         if (sortedPartyIndex >= sortedPartyAttackSequence.Count) return;
 
-        sortedPartyAttackSequence[sortedPartyIndex].CircleManager.SpawnReduceCircle(startTime, endTime, arrow, false);
-    }
-    public void PlayPartyGuardCircle(int index, double startTime, double endTime)
-    {
-        if (index >= sortedPartyGuardSequence.Count) return;
-
-        foreach (Character character in sortedPartyGuardSequence[index])
-        {
-            sortedPartyAttackSequence[index].CircleManager.SpawnReduceCircle(startTime, endTime, Arrow.Up, true);
-        }
+        sortedPartyAttackSequence[sortedPartyIndex].CircleManager.SpawnReduceCircle(startTime, endTime, arrow, false, targetTick);
     }
 
     public void PlayPartyReBounce()
@@ -224,24 +219,27 @@ public class GameManager : MonoBehaviour
     #region Input
     public void PressedKey(Arrow arrow)
     {
-        Character member; 
-        Accuracy accuracy = tickManager.GetAccuracy(9 + (2 * pressCount));
+        Character member;
+        Accuracy accuracy;
 
-        if (tickManager.TickCount > 16)
+        if (tickManager.TickCount > 16 && nowSkillCaster != null)
         {
-            
+            member = nowSkillCaster;
+            accuracy = tickManager.GetAccuracy(member.GetFirstCircleTick(arrow));
+            member.AttackCommand(accuracy, arrow);
         }
         else
         {
             if (pressCount >= sortedPartyAttackSequence.Count)
                 return;
-
             int skillIndex = (int)arrow;
-            member = sortedPartyAttackSequence[pressCount];
-            member.SkillCommand(accuracy, skillIndex);
-        }
 
-        pressCount++;
+            member = sortedPartyAttackSequence[pressCount];
+            accuracy = tickManager.GetAccuracy(member.GetFirstCircleTick(Arrow.Up));
+            member.SkillCommand(accuracy, skillIndex);
+
+            pressCount++;
+        }
     }
     #endregion
 }

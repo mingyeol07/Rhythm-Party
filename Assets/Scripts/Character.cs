@@ -1,4 +1,5 @@
 // # Systems
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -30,6 +31,7 @@ public class Character : MonoBehaviour
     [SerializeField] private DamageText damageText;
 
     private Vector3 returnPosition;
+    private bool isMoveToCam;
 
     private void Start()
     {
@@ -39,6 +41,8 @@ public class Character : MonoBehaviour
         skills[1] = new ElectricStorm(this);
         skills[2] = new ElectricStorm(this);
         skills[3] = new ElectricStorm(this);
+
+        returnPosition = transform.position;
     }
 
     public void Damaged(int damage)
@@ -87,25 +91,36 @@ public class Character : MonoBehaviour
         animator.SetTrigger("Bounce");
     }
 
+    public int GetFirstCircleTick(Arrow arrow)
+    {
+        if(circleManager.GetCircleSpawner(arrow).ReduceCircleQueue.Count > 0)
+        {
+            return circleManager.GetCircleSpawner(arrow).ReduceCircleQueue.Peek().TargetTick;
+        }
+
+        return 0;
+    }
+
     public void AttackCommand(Accuracy accuracy, Arrow arrow)
     {
-        circleManager.PressedAttack(accuracy, arrow);
+        circleManager.PressedAttackCommand(accuracy, arrow);
     }
 
     public void SkillCommand(Accuracy accuracy, int skillIndex)
     {
-        animator.SetBool("Commanded", true);
+        //animator.SetBool("Commanded", true);
         circleManager.PressedCommand(accuracy);
 
+        // 스킬 세팅
         nextSkill = skills[skillIndex];
     }
 
     public IEnumerator MoveToCameraFront(float x)
     {
-        returnPosition = transform.position;
+        isMoveToCam = true;
 
         Vector3 endPos = new Vector3(x, 0.5f, -10f);
-        float maxTime = 0.5f;
+        float maxTime = 0.2f;
         float time = 0;
 
         while(time < maxTime)
@@ -117,17 +132,23 @@ public class Character : MonoBehaviour
         }
 
         transform.position = endPos;
+        isMoveToCam = false;
     }
 
     public IEnumerator ReturnToInPlace()
     {
         Vector3 nowPos = transform.position;
 
-        float maxTime = 0.5f;
+        float maxTime = 0.2f;
         float time = 0;
 
         while (time < maxTime)
         {
+            if (isMoveToCam)
+            {
+                isMoveToCam = false;
+                yield break;
+            }
             time += Time.deltaTime;
             float t = time / maxTime;
             transform.position = Vector3.Lerp(nowPos, returnPosition, t);

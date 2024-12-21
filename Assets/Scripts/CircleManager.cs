@@ -19,9 +19,14 @@ public class CircleManager : MonoBehaviour
     [Header("ReduceCircle")]
     [SerializeField] private CircleSpawner[] circleSpawners;
 
-    public void SpawnReduceCircle(double currentTime, double nextTime, Arrow arrow, bool isGuardTiming = false )
+    public CircleSpawner GetCircleSpawner(Arrow arrow)
     {
-        circleSpawners[(int)arrow].SpawnCircle(currentTime, nextTime, isGuardTiming);
+        return circleSpawners[(int)arrow];
+    }
+
+    public void SpawnReduceCircle(double currentTime, double nextTime, Arrow arrow, bool isGuardTiming, int targetTick)
+    {
+        circleSpawners[(int)arrow].SpawnCircle(currentTime, nextTime, isGuardTiming, targetTick);
     }
 
     public void PressedCommand(Accuracy accuracy)
@@ -30,7 +35,7 @@ public class CircleManager : MonoBehaviour
         circleSpawners[(int)Arrow.Up].ShowText(accuracy);
     }
 
-    public void PressedAttack(Accuracy accuracy, Arrow arrow)
+    public void PressedAttackCommand(Accuracy accuracy, Arrow arrow)
     {
         CircleSpawner spawner = circleSpawners[(int)arrow];
         if (spawner.ReduceCircleQueue.Count > 0)

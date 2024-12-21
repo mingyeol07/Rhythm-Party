@@ -39,10 +39,10 @@ public class TickManager : MonoBehaviour
     private double hitTolerance = 0.3d;
 
     // 원
-    private int circleWaitTick = 2; // 원을 때리기 전이 몇 틱 전인지 정의
-    private int realCircleWaitTick = 4;
-    private double circleWaitTimeTwo; // 원을 보여주기 전 시점과 타이밍의 차이를 계산
+    private int circleWaitTickOne = 2; // 원을 때리기 전이 몇 틱 전인지 정의
+    private int circleWaitTickTwo = 4;
     private double circleWaitTimeOne; 
+    private double circleWaitTimeTwo; // 원을 보여주기 전 시점과 타이밍의 차이를 계산
     private int attackWaitTime = 8; // 박자를 누르고 나서 얼마나 기다리는지의 값
 
     private double enemyCircleWaitTime;
@@ -68,11 +68,12 @@ public class TickManager : MonoBehaviour
     private double aBeat;
     private double realbeat;
 
-    private Skill skill;
-    private int attackCommandCount = 0;
-    private int attackCommandWaitCount = 2;
-    private Queue<Arrow> arrowQueue = new Queue<Arrow>();
+    private Skill castingSkill;
 
+    private int attackCommandBeforeWaitCount;
+    private int attackCommandAfterWaitCount;
+
+    private Queue<Arrow> arrowQueue = new Queue<Arrow>();
     private Dictionary<int, bool> tickDict = new Dictionary<int, bool>();
 
     private void Start()
@@ -80,8 +81,8 @@ public class TickManager : MonoBehaviour
         aBeat = (60d / bpm);
         realbeat = (30d / bpm); // 반박자를 세기위함
 
-        circleWaitTimeTwo = aBeat * circleWaitTick;
-        circleWaitTimeOne = aBeat * 1;
+        circleWaitTimeTwo = aBeat * circleWaitTickTwo;
+        circleWaitTimeOne = aBeat * circleWaitTickOne;
         enemyCircleWaitTime = aBeat;
     }
 
@@ -138,23 +139,23 @@ public class TickManager : MonoBehaviour
         // 플레이어의 어택커맨드 타이밍인 5,6,7,8의 1초 전에 미리 서클애니메이션 진행
         if(tickCount == 5)
         {
-            tickDict.Add(5 + realCircleWaitTick, true);
-            GameManager.Instance.PlayPartyTimingCircle(0, realCurrentTime, circleWaitTimeTwo, Arrow.Up);
+            tickDict.Add(tickCount + circleWaitTickOne, true);
+            GameManager.Instance.PlayPartyTimingCircle(0, realCurrentTime, circleWaitTimeOne, Arrow.Up, tickCount + circleWaitTickOne);
         }
-        else if (tickCount == 7)
+        if (tickCount == 7)
         {
-            tickDict.Add(7 + realCircleWaitTick, true);
-            GameManager.Instance.PlayPartyTimingCircle(1, realCurrentTime, circleWaitTimeTwo, Arrow.Up);
+            tickDict.Add(tickCount + circleWaitTickOne, true);
+            GameManager.Instance.PlayPartyTimingCircle(1, realCurrentTime, circleWaitTimeOne, Arrow.Up, tickCount + circleWaitTickOne);
         }
-        else if (tickCount == 9)
+        if (tickCount == 9)
         {
-            tickDict.Add(9 + realCircleWaitTick, true);
-            GameManager.Instance.PlayPartyTimingCircle(2, realCurrentTime, circleWaitTimeTwo, Arrow.Up);
+            tickDict.Add(tickCount + circleWaitTickOne, true);
+            GameManager.Instance.PlayPartyTimingCircle(2, realCurrentTime, circleWaitTimeOne, Arrow.Up, tickCount + circleWaitTickOne);
         }
-        else if (tickCount == 11)
+        if (tickCount == 11)
         {
-            tickDict.Add(11 + realCircleWaitTick, true);
-            GameManager.Instance.PlayPartyTimingCircle(3, currentTime, circleWaitTimeTwo, Arrow.Up);
+            tickDict.Add(tickCount + circleWaitTickOne, true);
+            GameManager.Instance.PlayPartyTimingCircle(3, realCurrentTime, circleWaitTimeOne, Arrow.Up, tickCount + circleWaitTickOne);
         }
 
         if(turnState == TurnState.PlayerAttacking)
@@ -225,42 +226,62 @@ public class TickManager : MonoBehaviour
    
     private void PartyCommandAttack()
     {
+        if (attackCommandAfterWaitCount > 0)
+        {
+            attackCommandAfterWaitCount--;
+            return;
+        }
+
         if (!changeSkillCasterFlag)
         {
-            GameManager.Instance.SetNowSkillCaster(ref skill, attackCharacterIndexCount);
+            GameManager.Instance.SetNowSkillCaster(ref castingSkill, attackCharacterIndexCount);
 
             if (GameManager.Instance.NowSkillCaster == null)
             {
+                GameManager.Instance.ZoomOutCharacter();
+                GameManager.Instance.ZoomOutTargets();
                 turnState = TurnState.EnemyCommanding;
                 return;
             }
 
-            skill.GetSkillCommandList(ref arrowQueue);
-
             GameManager.Instance.ZoomOutCharacter();
-            GameManager.Instance.ZoomInCharacter(skill);
-            
+            GameManager.Instance.ZoomInCharacter(castingSkill);
+
+            GameManager.Instance.ZoomOutTargets();
+            GameManager.Instance.ZoomInTargets(castingSkill);
+
+            castingSkill.GetSkillCommandList(ref arrowQueue);
+
             changeSkillCasterFlag = true;
-            attackCommandWaitCount = 4;
+            attackCommandBeforeWaitCount = 4;
         }
 
-        if(attackCommandWaitCount > 0)
+        if(attackCommandBeforeWaitCount > 0)
         {
-            attackCommandWaitCount--;
+            attackCommandBeforeWaitCount--;
             return;
         }
 
         Arrow arrow = arrowQueue.Dequeue();
         if(arrow != Arrow.None)
         {
-            GameManager.Instance.PlayPartyTimingCircle(attackCharacterIndexCount, realCurrentTime, circleWaitTimeOne, arrow);
-            tickDict.Add(tickCount + realCircleWaitTick, true);
+            tickDict.Add(tickCount + circleWaitTickOne, true);
+            GameManager.Instance.PlayPartyTimingCircle(attackCharacterIndexCount, realCurrentTime, circleWaitTimeOne, arrow, tickCount + circleWaitTickOne);
         }
 
         if (arrowQueue.Count == 0)
         {
             changeSkillCasterFlag = false;
             attackCharacterIndexCount++;
+
+            if(tickCount % 2 != 0)
+            {
+                attackCommandAfterWaitCount = 5;
+            }
+            else
+            {
+                attackCommandAfterWaitCount = 4;
+            }
         }
     }
 
@@ -271,8 +292,18 @@ public class TickManager : MonoBehaviour
 
     public Accuracy GetAccuracy(int targetTick)
     {
-        if (!tickDict.ContainsKey(targetTick)) return Accuracy.Miss;
-        if (tickCount < targetTick - 1) return Accuracy.Miss;
+        Debug.Log(targetTick);
+
+        if (!tickDict.ContainsKey(targetTick))
+        {
+            return Accuracy.Miss;
+        }
+      
+        if (tickCount < targetTick - 1)
+        {
+            return Accuracy.Miss;
+        }
+
         // 5/5가 다음 틱이라면
         // Mathf.Abs((float)(currentTime - 60d / bpm)) 다음 틱에 얼마나 근접햇는지 4/5
         // Mathf.Abs((float)currentTime) <= tolerance 이전틱에서 얼마나 지나쳤는지 6/5

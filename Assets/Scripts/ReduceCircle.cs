@@ -19,6 +19,9 @@ public class ReduceCircle : MonoBehaviour
 
     private CircleSpawner mySpawner;
 
+    private int targetTick;
+    public int TargetTick => targetTick;
+
     private void Awake()
     {
         img = GetComponent<Image>();
@@ -84,7 +87,7 @@ public class ReduceCircle : MonoBehaviour
 
         while (circleMaterial.color.a > 0)
         {
-            reduceCircleColor.a -= Time.deltaTime * 2;
+            reduceCircleColor.a -= Time.deltaTime * 3;
             circleMaterial.SetColor(materialColorName, reduceCircleColor);
 
             yield return null;
@@ -101,6 +104,11 @@ public class ReduceCircle : MonoBehaviour
             mySpawner.ReduceCircleQueue.Dequeue();
             Destroy(this.gameObject);
         }
+    }
+
+    public void SetTargetTick(int tick)
+    {
+        targetTick = tick;
     }
 
     private void OnDestroy()

@@ -23,11 +23,11 @@ public class ElectricStorm : Skill
 
         skillCommandList = new Arrow[7];
         skillCommandList[0] = Arrow.Down;
-        skillCommandList[1] = Arrow.None;
+        skillCommandList[1] = Arrow.Down;
         skillCommandList[2] = Arrow.Left;
-        skillCommandList[3] = Arrow.None;
+        skillCommandList[3] = Arrow.Left;
         skillCommandList[4] = Arrow.Right;
-        skillCommandList[5] = Arrow.None;
+        skillCommandList[5] = Arrow.Right;
         skillCommandList[6] = Arrow.Up;
 
         targetIndex = new int[4];

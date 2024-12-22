@@ -21,7 +21,7 @@ public class ElectricStorm : Skill
     {
         damage = 40;
 
-        skillCommandList = new Arrow[7];
+        skillCommandList = new Arrow[8];
         skillCommandList[0] = Arrow.Down;
         skillCommandList[1] = Arrow.Down;
         skillCommandList[2] = Arrow.Left;
@@ -29,6 +29,7 @@ public class ElectricStorm : Skill
         skillCommandList[4] = Arrow.Right;
         skillCommandList[5] = Arrow.Right;
         skillCommandList[6] = Arrow.Up;
+        skillCommandList[7] = Arrow.Up;
 
         targetIndex = new int[4];
         targetIndex[0] = 0;

@@ -17,19 +17,18 @@ public class Character : MonoBehaviour
     [SerializeField] private int speed;
     public int Speed => speed;
 
-    // 공격 기회를 알려주는 써클 
-    [SerializeField] private CircleManager circleManager;
-    public CircleManager CircleManager => circleManager;
-
     private Skill nextSkill;
     public Skill NextSkill => nextSkill;
 
-    // 컴포넌트들
+    [Header("Component")]
+    [SerializeField] private CircleManager circleManager;
+    public CircleManager CircleManager => circleManager;
     [SerializeField] private Animator animator;
     [SerializeField] private Animator bounceAnimator;
 
-    // UI들
+    [Header("UI")]
     [SerializeField] private DamageText damageText;
+    [SerializeField] private Animator commandFailedAnimator;
 
     private Vector3 returnPosition;
     private bool isMoveToCam;
@@ -111,6 +110,11 @@ public class Character : MonoBehaviour
 
         // 스킬 세팅
         nextSkill = skills[skillIndex];
+    }
+
+    public void CommandFailedAnimation()
+    {
+        commandFailedAnimator.SetTrigger("Failed");
     }
 
     public IEnumerator MoveToCameraFront(float x)

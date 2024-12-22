@@ -211,6 +211,7 @@ MonoBehaviour:
   animator: {fileID: 6669176528784270180}
   bounceAnimator: {fileID: 6349488734322284573}
   damageText: {fileID: 3211070822415293098}
+  commandFailedAnimator: {fileID: 8050643738923170169}
 --- !u!1001 &6669176528112554243
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -351,3 +352,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3059b13b13455f4ea6e7ee83c54e12e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &8050643738923170169 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 3689588718428579962, guid: 8b5ee5b784e22f440a18677df817f3fe, type: 3}
+  m_PrefabInstance: {fileID: 6669176528112554243}
+  m_PrefabAsset: {fileID: 0}

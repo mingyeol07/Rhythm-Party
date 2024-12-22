@@ -104,10 +104,12 @@ public class ReduceCircle : MonoBehaviour
 
     public void ExitCircleQueue()
     {
+        // 미처 선택되지 못하고 도태되는 서클의 최후
         if(mySpawner.ReduceCircleQueue.Count > 0)
         {
             mySpawner.ReduceCircleQueue.Dequeue();
             mySpawner.CircleManager.SkillCircleQueue.Dequeue();
+            mySpawner.ShowText(Accuracy.Miss);
             Destroy(this.gameObject);
         }
     }

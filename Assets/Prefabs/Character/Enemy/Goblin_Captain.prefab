@@ -211,6 +211,7 @@ MonoBehaviour:
   animator: {fileID: 2380415827578659725}
   bounceAnimator: {fileID: 8765992874639001482}
   damageText: {fileID: 5842647305409777152}
+  commandFailedAnimator: {fileID: 1314174716734631379}
 --- !u!1001 &2380415826478826921
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -328,6 +329,11 @@ PrefabInstance:
       objectReference: {fileID: 229911416421264541, guid: d58c5612db56f764084db3bff82b4ba7, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8b5ee5b784e22f440a18677df817f3fe, type: 3}
+--- !u!95 &1314174716734631379 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 3689588718428579962, guid: 8b5ee5b784e22f440a18677df817f3fe, type: 3}
+  m_PrefabInstance: {fileID: 2380415826478826921}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &5842647305409777152 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8078806072357997481, guid: 8b5ee5b784e22f440a18677df817f3fe, type: 3}

@@ -29,7 +29,6 @@ public class GameManager : MonoBehaviour
     public List<Character> PartyMembers => partyMembers;
 
     private List<Character> sortedPartyAttackSequence = new List<Character>();
-    private List<List<Character>> sortedPartyGuardSequence = new List<List<Character>>();
 
     private Character nowSkillCaster = null;
     public Character NowSkillCaster => nowSkillCaster;
@@ -39,7 +38,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<Character> enemyMembers = new List<Character>();
     public List<Character> EnemyMembers => enemyMembers;
 
-    private List<List<Character>> sortedEnemyAttackSequence = new List<List<Character>>();
     #endregion
 
     [SerializeField] private Animator bounceAnimator;
@@ -135,11 +133,9 @@ public class GameManager : MonoBehaviour
             skill = null;
             return;
         }
-        else
-        {
-            nowSkillCaster = sortedPartyAttackSequence[skillCasterIndex];
-            skill = nowSkillCaster.NextSkill;
-        }
+
+        nowSkillCaster = sortedPartyAttackSequence[skillCasterIndex];
+        skill = nowSkillCaster.NextSkill;
     }
 
     public void SortPartyMember()
@@ -157,6 +153,11 @@ public class GameManager : MonoBehaviour
         if (sortedPartyIndex >= sortedPartyAttackSequence.Count) return;
 
         sortedPartyAttackSequence[sortedPartyIndex].CircleManager.SpawnReduceCircle(startTime, endTime, arrow, type, targetTick);
+    }
+
+    public void ShowCommandFailed(int sortedPartyIndex)
+    {
+        sortedPartyAttackSequence[sortedPartyIndex].CommandFailedAnimation();
     }
 
     public void PlayPartyReBounce()
@@ -213,7 +214,7 @@ public class GameManager : MonoBehaviour
     #endregion Enemy
 
     #region Input
-    public void PressedKey(Arrow arrow)
+    public void PressedKey(Arrow myInputArrow)
     {
         Character member;
         Accuracy accuracy;
@@ -221,25 +222,38 @@ public class GameManager : MonoBehaviour
         if (tickManager.TickCount > 16 && nowSkillCaster != null)
         {
             member = nowSkillCaster;
-            ReduceCircle circle = member.CircleManager.SkillCircleQueue.Peek();
-            if(arrow != circle.ArrowType)
+
+            if (member.CircleManager.SkillCircleQueue.TryPeek(out ReduceCircle circle))
             {
-                accuracy = Accuracy.Miss;
+                if (myInputArrow != circle.ArrowType)
+                {
+                    accuracy = Accuracy.Miss;
+                }
+                else
+                {
+                    accuracy = tickManager.GetAccuracy(circle.TargetTick);
+                }
+
+                member.AttackCommand(accuracy, circle.ArrowType);
             }
             else
             {
-                accuracy = tickManager.GetAccuracy(circle.TargetTick);
+                member.AttackCommand(Accuracy.Miss, myInputArrow);
             }
-
-            member.AttackCommand(accuracy, circle.ArrowType);
         }
         else
         {
             if (pressCount >= sortedPartyAttackSequence.Count)
                 return;
-            int skillIndex = (int)arrow;
+            int skillIndex = (int)myInputArrow;
 
             member = sortedPartyAttackSequence[pressCount];
+            while(member.GetFirstCircleInSpawner(Arrow.Up) == null)
+            {
+                pressCount++;
+                if (pressCount > 3) return;
+                member = sortedPartyAttackSequence[pressCount];
+            }
             accuracy = tickManager.GetAccuracy(member.GetFirstCircleInSpawner(Arrow.Up).TargetTick);
             member.SkillCommand(accuracy, skillIndex);
 

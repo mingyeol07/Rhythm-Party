@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
-public enum CircleType
+public enum TimingCircleType
 {
     None,
     Command,
@@ -45,7 +45,7 @@ public class CircleSpawner : MonoBehaviour
         circleManager = manager;
     }    
 
-    public void SpawnCircle(double currentTime, double endTime, Arrow arrow, CircleType type, int targetTick)
+    public void SpawnCircle(double currentTime, double endTime, Arrow arrow, TimingCircleType type, int targetTick, int circleSpawnCount)
     {
         if(reduceCircleQueue.Count ==0)
         {
@@ -56,7 +56,8 @@ public class CircleSpawner : MonoBehaviour
         GameObject circle = Instantiate(reduceCirclePrefab, reduceCircleParent);
         ReduceCircle reduceCircle = circle.GetComponent<ReduceCircle>();
 
-        reduceCircle.Init(this, targetTick, arrow);
+        StartCoroutine(reduceCircle.Co_Appear());
+        reduceCircle.Init(this, targetTick, arrow, circleSpawnCount);
 
         circleManager.SkillCircleQueue.Enqueue(reduceCircle);
         reduceCircleQueue.Enqueue(reduceCircle);
@@ -65,23 +66,23 @@ public class CircleSpawner : MonoBehaviour
         StartCoroutine(reduceCircle.Co_StartReduce(currentTime, endTime));
     }
 
-    private void AppearTimingCircle(CircleType type)
+    private void AppearTimingCircle(TimingCircleType type)
     {
         switch(type)
         {
-            case CircleType.Command:
+            case TimingCircleType.Command:
                 timingCircle.CircleMaterial.color = Color.yellow;
                 break;
-            case CircleType.Attack:
+            case TimingCircleType.Attack:
                 timingCircle.CircleMaterial.color = Color.red;
                 break;
-            case CircleType.AttackCharge:
+            case TimingCircleType.AttackCharge:
                 timingCircle.CircleMaterial.color = Color.gray;
                 break;
-            case CircleType.Guard:
+            case TimingCircleType.Guard:
                 timingCircle.CircleMaterial.color = Color.cyan;
                 break;
-            case CircleType.GuardCharge:
+            case TimingCircleType.GuardCharge:
                 timingCircle.CircleMaterial.color = Color.gray;
                 break;
         }
@@ -94,17 +95,17 @@ public class CircleSpawner : MonoBehaviour
         StartCoroutine(timingCircle.Co_Vanish());
     }
 
-    public IEnumerator PressedCircle()
+    public void PressedCircle()
     {
         circleManager.SkillCircleQueue.Dequeue();
         ReduceCircle circle = reduceCircleQueue.Dequeue();
+
         if (reduceCircleQueue.Count == 0)
         {
             VanishTimingCircle();
         }
 
-        yield return StartCoroutine(circle.Co_Vanish());
-        Destroy(circle.gameObject);
+        StartCoroutine(circle.Clicked());
     }
 
     public void ShowText(Accuracy accuracy)

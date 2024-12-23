@@ -35,8 +35,8 @@ public class TickManager : MonoBehaviour
 
     // 오차범위
     private double criticalTolerance = 0.05d; // 허용 오차 범위 0.05 == 50ms
-    private double strikeTolerance = 0.15d;
-    private double hitTolerance = 0.3d;
+    private double strikeTolerance = 0.125d;
+    private double hitTolerance = 0.2d;
 
     // 원
     private int circleWaitTickOne = 2; // 원을 때리기 전이 몇 틱 전인지 정의
@@ -116,22 +116,22 @@ public class TickManager : MonoBehaviour
         if(tickCount == 5)
         {
             tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            GameManager.Instance.PlayPartyTimingCircle(0, realCurrentTime, circleWaitTimeOne, Arrow.Up, CircleType.Command, tickCount + circleWaitTickOne);
+            GameManager.Instance.PlayPartyTimingCircle(0, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingCircleType.Command, tickCount + circleWaitTickOne);
         }
         if (tickCount == 7)
         {
             tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            GameManager.Instance.PlayPartyTimingCircle(1, realCurrentTime, circleWaitTimeOne, Arrow.Up, CircleType.Command, tickCount + circleWaitTickOne);
+            GameManager.Instance.PlayPartyTimingCircle(1, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingCircleType.Command, tickCount + circleWaitTickOne);
         }
         if (tickCount == 9)
         {
             tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            GameManager.Instance.PlayPartyTimingCircle(2, realCurrentTime, circleWaitTimeOne, Arrow.Up, CircleType.Command, tickCount + circleWaitTickOne);
+            GameManager.Instance.PlayPartyTimingCircle(2, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingCircleType.Command, tickCount + circleWaitTickOne);
         }
         if (tickCount == 11)
         {
             tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            GameManager.Instance.PlayPartyTimingCircle(3, realCurrentTime, circleWaitTimeOne, Arrow.Up, CircleType.Command, tickCount + circleWaitTickOne);
+            GameManager.Instance.PlayPartyTimingCircle(3, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingCircleType.Command, tickCount + circleWaitTickOne);
         }
 
         if(turnState == TurnState.PlayerAttacking)
@@ -187,7 +187,7 @@ public class TickManager : MonoBehaviour
             if (arrow != Arrow.None)
             {
                 tickDict.Add(tickCount + circleWaitTickOne, arrow);
-                GameManager.Instance.PlayPartyTimingCircle(attackCharacterIndexCount, realCurrentTime, circleWaitTimeOne, arrow, CircleType.Attack, tickCount + circleWaitTickOne);
+                GameManager.Instance.PlayPartyTimingCircle(attackCharacterIndexCount, realCurrentTime, circleWaitTimeOne, arrow, TimingCircleType.Attack, tickCount + circleWaitTickOne);
             }
         }
         else
@@ -227,27 +227,30 @@ public class TickManager : MonoBehaviour
         }
 
         double time = 0;
+        double beat = 0;
         if(targetTick % 2 != 0)
         {
             time = currentTime;
+            beat = aBeat;
         }
         else
         {
             time = realCurrentTime;
+            beat = realbeat;
         }
         // 5/5가 다음 틱이라면
         // Mathf.Abs((float)(currentTime - 60d / bpm)) 다음 틱에 얼마나 근접햇는지 4/5
         // Mathf.Abs((float)currentTime) <= tolerance 이전틱에서 얼마나 지나쳤는지 6/5
 
-        if (Mathf.Abs((float)time) <= criticalTolerance || Mathf.Abs((float)(time - aBeat)) <= criticalTolerance)
+        if (Mathf.Abs((float)time) <= criticalTolerance || Mathf.Abs((float)(time - beat)) <= criticalTolerance)
         {
             return Accuracy.Critical;
         }
-        else if (Mathf.Abs((float)time) <= strikeTolerance || Mathf.Abs((float)(time - aBeat)) <= strikeTolerance)
+        else if (Mathf.Abs((float)time) <= strikeTolerance || Mathf.Abs((float)(time - beat)) <= strikeTolerance)
         {
             return Accuracy.Strike;
         }
-        else if (Mathf.Abs((float)time) <= hitTolerance || Mathf.Abs((float)(time - aBeat)) <= hitTolerance)
+        else if (Mathf.Abs((float)time) <= hitTolerance || Mathf.Abs((float)(time - beat)) <= hitTolerance)
         {
             return Accuracy.Hit;
         }

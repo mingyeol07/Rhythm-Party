@@ -148,7 +148,7 @@ public class GameManager : MonoBehaviour
         sortedPartyAttackSequence.Sort((a, b) => b.Speed.CompareTo(a.Speed));
     }
 
-    public void PlayPartyTimingCircle(int sortedPartyIndex, double startTime, double endTime, Arrow arrow, CircleType type, int targetTick)
+    public void PlayPartyTimingCircle(int sortedPartyIndex, double startTime, double endTime, Arrow arrow, TimingCircleType type, int targetTick)
     {
         if (sortedPartyIndex >= sortedPartyAttackSequence.Count) return;
 

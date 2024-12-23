@@ -21,6 +21,8 @@ public class CircleManager : MonoBehaviour
     private Queue<ReduceCircle> skillCircleQueue = new Queue<ReduceCircle>();
     public Queue<ReduceCircle> SkillCircleQueue => skillCircleQueue;
 
+    private int circleSpawnCount = 0;
+
     private void Awake()
     {
         for(int i =0; i < circleSpawners.Length; i++)
@@ -34,14 +36,23 @@ public class CircleManager : MonoBehaviour
         return circleSpawners[(int)arrow];
     }
 
-    public void SpawnReduceCircle(double currentTime, double nextTime, Arrow arrow, CircleType type, int targetTick)
+    public void SpawnReduceCircle(double currentTime, double nextTime, Arrow arrow, TimingCircleType type, int targetTick)
     {
-        circleSpawners[(int)arrow].SpawnCircle(currentTime, nextTime, arrow, type, targetTick);
+        circleSpawnCount++;
+        Arrow l_arrow = arrow;
+
+        if (type == TimingCircleType.Command)
+        {
+            l_arrow = Arrow.None;
+            circleSpawnCount = 0;
+        }
+
+        circleSpawners[(int)arrow].SpawnCircle(currentTime, nextTime, l_arrow, type, targetTick, circleSpawnCount);
     }
 
     public void PressedCommand(Accuracy accuracy)
     {
-        StartCoroutine(circleSpawners[(int)Arrow.Up].PressedCircle());
+        circleSpawners[(int)Arrow.Up].PressedCircle();
         circleSpawners[(int)Arrow.Up].ShowText(accuracy);
     }
 
@@ -50,7 +61,7 @@ public class CircleManager : MonoBehaviour
         CircleSpawner spawner = circleSpawners[(int)arrow];
         if (spawner.ReduceCircleQueue.Count > 0)
         {
-            StartCoroutine(spawner.PressedCircle());
+            spawner.PressedCircle();
             spawner.ShowText(accuracy);
         }
         else

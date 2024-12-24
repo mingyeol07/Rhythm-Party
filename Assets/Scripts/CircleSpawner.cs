@@ -59,7 +59,7 @@ public class CircleSpawner : MonoBehaviour
         StartCoroutine(reduceCircle.Co_Appear());
         reduceCircle.Init(this, targetTick, arrow, circleSpawnCount);
 
-        circleManager.SkillCircleQueue.Enqueue(reduceCircle);
+        //circleManager.SkillCircleQueue.Enqueue(reduceCircle);
         reduceCircleQueue.Enqueue(reduceCircle);
 
         // 원 줄어들기 코루틴
@@ -97,7 +97,7 @@ public class CircleSpawner : MonoBehaviour
 
     public void PressedCircle()
     {
-        circleManager.SkillCircleQueue.Dequeue();
+        //circleManager.SkillCircleQueue.Dequeue();
         ReduceCircle circle = reduceCircleQueue.Dequeue();
 
         if (reduceCircleQueue.Count == 0)

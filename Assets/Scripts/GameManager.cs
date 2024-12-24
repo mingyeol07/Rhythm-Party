@@ -114,6 +114,7 @@ public class GameManager : MonoBehaviour
     {
         if (previousZoomInCaster == null) return;
         StartCoroutine(previousZoomInCaster.ReturnToInPlace());
+        previousZoomInCaster.ReBounce();
     }
 
     public void ZoomOutTargets()
@@ -121,6 +122,7 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < previousZoomInTargets.Count; i++)
         {
             StartCoroutine(previousZoomInTargets[i].ReturnToInPlace());
+            previousZoomInTargets[i].ReBounce();
         }
     }
 
@@ -222,8 +224,9 @@ public class GameManager : MonoBehaviour
         if (tickManager.TickCount > 16 && nowSkillCaster != null)
         {
             member = nowSkillCaster;
+            CircleSpawner spawner = member.CircleManager.GetCircleSpawner(myInputArrow);
 
-            if (member.CircleManager.SkillCircleQueue.TryPeek(out ReduceCircle circle))
+            if (spawner.ReduceCircleQueue.TryPeek(out ReduceCircle circle))
             {
                 if (myInputArrow != circle.ArrowType)
                 {

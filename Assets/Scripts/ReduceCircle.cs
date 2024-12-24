@@ -204,7 +204,7 @@ public class ReduceCircle : MonoBehaviour
         if (mySpawner.ReduceCircleQueue.Count > 0)
         {
             mySpawner.ReduceCircleQueue.Dequeue();
-            mySpawner.CircleManager.SkillCircleQueue.Dequeue();
+            //mySpawner.CircleManager.SkillCircleQueue.Dequeue();
             mySpawner.ShowText(Accuracy.Miss);
             Destroy(this.gameObject);
         }

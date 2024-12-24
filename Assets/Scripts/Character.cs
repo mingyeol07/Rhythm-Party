@@ -12,7 +12,6 @@ public class Character : MonoBehaviour
 {
     private Skill[] skills = new Skill[4];
 
-    // 스탯
     private int hp = 999;
     [SerializeField] private int speed;
     public int Speed => speed;
@@ -33,6 +32,18 @@ public class Character : MonoBehaviour
     private Vector3 returnPosition;
     private bool isMoveToCam;
 
+    private readonly int hashTrigCommandFailed = Animator.StringToHash("Failed");
+    private readonly int hashTrigBounce = Animator.StringToHash("Bounce");
+
+    private readonly int hashTrigExit = Animator.StringToHash("Exit");
+    private readonly int hashTrigCommand = Animator.StringToHash("Command");
+    private readonly int hashTrigDamage= Animator.StringToHash("Damage");
+
+    private readonly int hashTrigAtkLeft = Animator.StringToHash("AttackLeft");
+    private readonly int hashTrigAtkUp = Animator.StringToHash("AttackUp");
+    private readonly int hashTrigAtkDown = Animator.StringToHash("AttackDown");
+    private readonly int hashTrigAtkRight = Animator.StringToHash("AttackRight");
+
     private void Awake()
     {
         skills = new Skill[4];
@@ -51,6 +62,7 @@ public class Character : MonoBehaviour
     public void Damaged(int damage)
     {
         damageText.TextPlay(damageText.transform, damage);
+        //animator.SetTrigger(hashTrigDamage);
 
         hp -= damage;
         if (hp < 0)
@@ -64,27 +76,25 @@ public class Character : MonoBehaviour
 
     }
 
-    public void Attack(Accuracy accuracy)
+    private void Attack(Accuracy accuracy)
     {
         if(nextSkill == null)
         {
             return;
         }
 
-        animator.SetBool("Attacked", true);
-
-        nextSkill.Activate(nextSkill.DamageCalculation(accuracy));
+        int calculationDamage = nextSkill.DamageCalculation(accuracy);
+        nextSkill.Activate(calculationDamage);
     }
 
     public void BounceAnimation()
     {
-        bounceAnimator.SetTrigger("Bounce");
+        bounceAnimator.SetTrigger(hashTrigBounce);
     }
 
     public void ReBounce()
     {
-        animator.SetBool("Attacked", false);
-        animator.SetBool("Commanded", false);
+        animator.SetTrigger(hashTrigExit);
     }
 
     public ReduceCircle GetFirstCircleInSpawner(Arrow arrow)
@@ -100,12 +110,29 @@ public class Character : MonoBehaviour
     public void AttackCommand(Accuracy accuracy, Arrow arrow)
     {
         circleManager.PressedAttackCommand(accuracy, arrow);
+
+        switch (arrow)
+        {
+            case Arrow.Left:
+                animator.SetTrigger(hashTrigAtkLeft);
+                break;
+            case Arrow.Up:
+                animator.SetTrigger(hashTrigAtkUp);
+                break;
+            case Arrow.Down:
+                animator.SetTrigger(hashTrigAtkDown);
+                break;
+            case Arrow.Right:
+                animator.SetTrigger(hashTrigAtkRight);
+                break;
+        }
+
         Attack(accuracy);
     }
 
     public void SkillCommand(Accuracy accuracy, int skillIndex)
     {
-        animator.SetBool("Commanded", true);
+        animator.SetTrigger(hashTrigCommand);
         circleManager.PressedCommand(accuracy);
 
         // 스킬 세팅
@@ -114,7 +141,7 @@ public class Character : MonoBehaviour
 
     public void CommandFailedAnimation()
     {
-        commandFailedAnimator.SetTrigger("Failed");
+        commandFailedAnimator.SetTrigger(hashTrigCommandFailed);
     }
 
     public IEnumerator MoveToCameraFront(float x)

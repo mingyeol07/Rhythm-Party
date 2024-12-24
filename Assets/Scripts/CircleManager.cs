@@ -18,8 +18,8 @@ public class CircleManager : MonoBehaviour
 {
     [Header("ReduceCircle")]
     [SerializeField] private CircleSpawner[] circleSpawners;
-    private Queue<ReduceCircle> skillCircleQueue = new Queue<ReduceCircle>();
-    public Queue<ReduceCircle> SkillCircleQueue => skillCircleQueue;
+    //private Queue<ReduceCircle> skillCircleQueue = new Queue<ReduceCircle>();
+    //public Queue<ReduceCircle> SkillCircleQueue => skillCircleQueue;
 
     private int circleSpawnCount = 0;
 

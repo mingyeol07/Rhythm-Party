@@ -71,7 +71,7 @@ public class TickManager : MonoBehaviour
     private int attackCommandBeforeWaitCount;
     private int attackCommandAfterWaitCount;
 
-    private Queue<Arrow> arrowQueue = new Queue<Arrow>();
+    private Queue<Note> noteQueue = new Queue<Note>();
     private Dictionary<int, Arrow> tickDict = new Dictionary<int, Arrow>();
 
     private void Start()
@@ -116,22 +116,22 @@ public class TickManager : MonoBehaviour
         if(tickCount == 5)
         {
             tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            GameManager.Instance.PlayPartyTimingCircle(0, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingCircleType.Command, tickCount + circleWaitTickOne);
+            GameManager.Instance.PlayPartyTimingCircle(0, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
         }
         if (tickCount == 7)
         {
             tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            GameManager.Instance.PlayPartyTimingCircle(1, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingCircleType.Command, tickCount + circleWaitTickOne);
+            GameManager.Instance.PlayPartyTimingCircle(1, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
         }
         if (tickCount == 9)
         {
             tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            GameManager.Instance.PlayPartyTimingCircle(2, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingCircleType.Command, tickCount + circleWaitTickOne);
+            GameManager.Instance.PlayPartyTimingCircle(2, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
         }
         if (tickCount == 11)
         {
             tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            GameManager.Instance.PlayPartyTimingCircle(3, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingCircleType.Command, tickCount + circleWaitTickOne);
+            GameManager.Instance.PlayPartyTimingCircle(3, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
         }
 
         if(turnState == TurnState.PlayerAttacking)
@@ -157,6 +157,8 @@ public class TickManager : MonoBehaviour
                 GameManager.Instance.ZoomOutCharacter();
                 GameManager.Instance.ZoomOutTargets();
                 turnState = TurnState.EnemyCommanding;
+
+                GameManager.Instance.ZoomOutCam();
                 return;
             }
 
@@ -168,7 +170,12 @@ public class TickManager : MonoBehaviour
                 GameManager.Instance.ZoomOutTargets();
                 GameManager.Instance.ZoomInTargets(castingSkill);
 
-                castingSkill.GetSkillCommandList(ref arrowQueue);
+                GameManager.Instance.ZoomInCam();
+                castingSkill.GetSkillCommandList(ref noteQueue);
+            }
+            else
+            {
+                GameManager.Instance.ZoomOutCam();
             }
 
             changeSkillCasterFlag = true;
@@ -183,11 +190,16 @@ public class TickManager : MonoBehaviour
 
         if (castingSkill != null)
         {
-            Arrow arrow = arrowQueue.Dequeue();
-            if (arrow != Arrow.None)
+            Note note = noteQueue.Dequeue();
+            if (note.Dir != Arrow.None)
             {
-                tickDict.Add(tickCount + circleWaitTickOne, arrow);
-                GameManager.Instance.PlayPartyTimingCircle(attackCharacterIndexCount, realCurrentTime, circleWaitTimeOne, arrow, TimingCircleType.Attack, tickCount + circleWaitTickOne);
+                tickDict.Add(tickCount + circleWaitTickOne, note.Dir);
+
+                GameManager.Instance.PlayPartyTimingCircle(
+                    attackCharacterIndexCount, 
+                    realCurrentTime, circleWaitTimeOne, 
+                    note.Dir, TimingType.Attack, note.Type, 
+                    tickCount + circleWaitTickOne);
             }
         }
         else
@@ -195,7 +207,7 @@ public class TickManager : MonoBehaviour
              GameManager.Instance.ShowCommandFailed(attackCharacterIndexCount);
         }
 
-        if (arrowQueue.Count == 0)
+        if (noteQueue.Count == 0)
         {
             changeSkillCasterFlag = false;
             attackCharacterIndexCount++;
@@ -256,17 +268,5 @@ public class TickManager : MonoBehaviour
         }
 
         return Accuracy.Miss;
-    }
-
-    public Arrow GetNowArrowInTick(int targetTick)
-    {
-        if (!tickDict.ContainsKey(targetTick))
-        {
-            return Arrow.None;
-        }
-        else
-        {
-            return tickDict[targetTick];
-        }
     }
 }

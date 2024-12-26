@@ -36,12 +36,12 @@ public class CircleManager : MonoBehaviour
         return circleSpawners[(int)arrow];
     }
 
-    public void SpawnReduceCircle(double currentTime, double nextTime, Arrow arrow, TimingCircleType type, int targetTick)
+    public void SpawnReduceCircle(double currentTime, double nextTime, Arrow arrow, TimingType type, int targetTick)
     {
         circleSpawnCount++;
         Arrow l_arrow = arrow;
 
-        if (type == TimingCircleType.Command)
+        if (type == TimingType.Command)
         {
             l_arrow = Arrow.None;
             circleSpawnCount = 0;

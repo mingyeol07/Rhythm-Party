@@ -29,7 +29,7 @@ public class Character : MonoBehaviour
     [SerializeField] private DamageText damageText;
     [SerializeField] private Animator commandFailedAnimator;
 
-    private Vector3 returnPosition;
+    private Vector3 defaultPosition;
     private bool isMoveToCam;
 
     private readonly int hashTrigCommandFailed = Animator.StringToHash("Failed");
@@ -56,7 +56,7 @@ public class Character : MonoBehaviour
 
     private void Start()
     {
-        returnPosition = transform.position;
+        defaultPosition = transform.position;
     }
 
     public void Damaged(int damage)
@@ -144,11 +144,13 @@ public class Character : MonoBehaviour
         commandFailedAnimator.SetTrigger(hashTrigCommandFailed);
     }
 
-    public IEnumerator MoveToCameraFront(float x)
+    public IEnumerator Co_MoveToCameraFront(float x)
     {
         isMoveToCam = true;
 
-        Vector3 endPos = new Vector3(x, 0.5f, -10f);
+        Vector3 endPos = new Vector3(x, 0.5f, 0);
+        Vector3 endScale = new Vector3(1.5f, 1.5f, 1.5f);
+
         float maxTime = 0.2f;
         float time = 0;
 
@@ -156,17 +158,20 @@ public class Character : MonoBehaviour
         {
             time += Time.deltaTime;
             float t = time / maxTime;
-            transform.position = Vector3.Lerp(returnPosition, endPos, t);
+            transform.position = Vector3.Lerp(defaultPosition, endPos, t);
+            transform.localScale = Vector3.Lerp(Vector3.one, endScale, t);
             yield return null;
         }
 
         transform.position = endPos;
+        transform.localScale = endScale;
         isMoveToCam = false;
     }
 
-    public IEnumerator ReturnToInPlace()
+    public IEnumerator Co_ReturnToInPlace()
     {
         Vector3 nowPos = transform.position;
+        Vector3 nowScale = new Vector3(1.5f, 1.5f, 1.5f);
 
         float maxTime = 0.2f;
         float time = 0;
@@ -180,10 +185,12 @@ public class Character : MonoBehaviour
             }
             time += Time.deltaTime;
             float t = time / maxTime;
-            transform.position = Vector3.Lerp(nowPos, returnPosition, t);
+            transform.position = Vector3.Lerp(nowPos, defaultPosition, t);
+            transform.localScale = Vector3.Lerp(nowScale, Vector3.one, t);
             yield return null;
         }
 
-        transform.position = returnPosition;
+        transform.position = defaultPosition;
+        transform.localScale = Vector3.one;
     }
 }

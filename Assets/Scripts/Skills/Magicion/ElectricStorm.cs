@@ -21,20 +21,15 @@ public class ElectricStorm : Skill
     {
         damage = 40;
 
-        skillCommandList = new Arrow[8];
-        skillCommandList[0] = Arrow.Down;
-        skillCommandList[1] = Arrow.Left;
-        skillCommandList[2] = Arrow.Up;
-        skillCommandList[3] = Arrow.Right;
-        skillCommandList[4] = Arrow.Down;
-        skillCommandList[5] = Arrow.Right;
-        skillCommandList[6] = Arrow.Up;
-        skillCommandList[7] = Arrow.Left;
+        skillCommandList = new Note[]
+        {
+             new Note(Arrow.Down, NoteType.Short, 2),
+             new Note(Arrow.Down, NoteType.Long, 10),
+        };
 
-        targetIndex = new int[4];
-        targetIndex[0] = 0;
-        targetIndex[1] = 1;
-        targetIndex[2] = 2;
-        targetIndex[3] = 3;
+        targetIndex = new int[]
+        {
+            0,1,2,3,
+        };
     }
 }

@@ -45,12 +45,11 @@ public class GameManager : MonoBehaviour
     private int pressCount;
     public int PressCount => pressCount;
 
-    private Camera mainCam;
+    [SerializeField] private CamMoving camMove;
 
     private void Awake()
     {
         Instance = this;
-        mainCam = Camera.main;
     }
 
     private void Start()
@@ -71,12 +70,22 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void ZoomInCam()
+    {
+        StartCoroutine(camMove.Co_MoveAttackAngle());
+    }
+
+    public void ZoomOutCam()
+    {
+        StartCoroutine(camMove.Co_MoveDefaultAngle());
+    }
+
     public void ZoomInCharacter(Skill skill)
     {
         Character caster = skill.Caster;
         previousZoomInCaster = caster;
 
-        StartCoroutine(caster.MoveToCameraFront(-zoomInCamCenter));
+        StartCoroutine(caster.Co_MoveToCameraFront(-zoomInCamCenter));
     }
 
     public void ZoomInTargets(Skill skill)
@@ -104,7 +113,7 @@ public class GameManager : MonoBehaviour
                 character = partyMembers[targetArray[i]];
             }
             previousZoomInTargets.Add(character);
-            StartCoroutine(character.MoveToCameraFront(zoomInCamCenter + i * 1));
+            StartCoroutine(character.Co_MoveToCameraFront(zoomInCamCenter + i * 1.5f));
         }
 
         zoomInCamCenter = 1.7f;
@@ -113,7 +122,7 @@ public class GameManager : MonoBehaviour
     public void ZoomOutCharacter()
     {
         if (previousZoomInCaster == null) return;
-        StartCoroutine(previousZoomInCaster.ReturnToInPlace());
+        StartCoroutine(previousZoomInCaster.Co_ReturnToInPlace());
         previousZoomInCaster.ReBounce();
     }
 
@@ -121,7 +130,7 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < previousZoomInTargets.Count; i++)
         {
-            StartCoroutine(previousZoomInTargets[i].ReturnToInPlace());
+            StartCoroutine(previousZoomInTargets[i].Co_ReturnToInPlace());
             previousZoomInTargets[i].ReBounce();
         }
     }
@@ -150,11 +159,11 @@ public class GameManager : MonoBehaviour
         sortedPartyAttackSequence.Sort((a, b) => b.Speed.CompareTo(a.Speed));
     }
 
-    public void PlayPartyTimingCircle(int sortedPartyIndex, double startTime, double endTime, Arrow arrow, TimingCircleType type, int targetTick)
+    public void PlayPartyTimingCircle(int sortedPartyIndex, double startTime, double endTime, Arrow arrow, TimingType timingType, NoteType noteType, int targetTick)
     {
         if (sortedPartyIndex >= sortedPartyAttackSequence.Count) return;
 
-        sortedPartyAttackSequence[sortedPartyIndex].CircleManager.SpawnReduceCircle(startTime, endTime, arrow, type, targetTick);
+        sortedPartyAttackSequence[sortedPartyIndex].CircleManager.SpawnReduceCircle(startTime, endTime, arrow, timingType, targetTick);
     }
 
     public void ShowCommandFailed(int sortedPartyIndex)

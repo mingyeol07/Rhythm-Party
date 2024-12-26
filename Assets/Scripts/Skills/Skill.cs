@@ -11,7 +11,7 @@ public abstract class Skill
 {
     protected int damage;
     protected int[] targetIndex; // 0, 1, 2, 3?
-    protected Arrow[] skillCommandList;
+    protected Note[] skillCommandList;
     protected Character caster;
     protected bool isPartyTarget = false;
     public Character Caster => caster;
@@ -22,7 +22,7 @@ public abstract class Skill
     public abstract void Activate(int damage);
     public abstract void SetCommand();
 
-    public void GetSkillCommandList(ref Queue<Arrow> queue)
+    public void GetSkillCommandList(ref Queue<Note> queue)
     {
         for(int i =0; i < skillCommandList.Length; i++)
         {

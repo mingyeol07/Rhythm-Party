@@ -9,7 +9,7 @@ using UnityEngine;
 using UnityEngine.TextCore.Text;
 using UnityEngine.UI;
 
-public enum TimingCircleType
+public enum TimingType
 {
     None,
     Command,
@@ -45,7 +45,7 @@ public class CircleSpawner : MonoBehaviour
         circleManager = manager;
     }    
 
-    public void SpawnCircle(double currentTime, double endTime, Arrow arrow, TimingCircleType type, int targetTick, int circleSpawnCount)
+    public void SpawnCircle(double currentTime, double endTime, Arrow arrow, TimingType type, int targetTick, int circleSpawnCount)
     {
         if(reduceCircleQueue.Count ==0)
         {
@@ -66,23 +66,23 @@ public class CircleSpawner : MonoBehaviour
         StartCoroutine(reduceCircle.Co_StartReduce(currentTime, endTime));
     }
 
-    private void AppearTimingCircle(TimingCircleType type)
+    private void AppearTimingCircle(TimingType type)
     {
         switch(type)
         {
-            case TimingCircleType.Command:
+            case TimingType.Command:
                 timingCircle.CircleMaterial.color = Color.yellow;
                 break;
-            case TimingCircleType.Attack:
+            case TimingType.Attack:
                 timingCircle.CircleMaterial.color = Color.red;
                 break;
-            case TimingCircleType.AttackCharge:
+            case TimingType.AttackCharge:
                 timingCircle.CircleMaterial.color = Color.gray;
                 break;
-            case TimingCircleType.Guard:
+            case TimingType.Guard:
                 timingCircle.CircleMaterial.color = Color.cyan;
                 break;
-            case TimingCircleType.GuardCharge:
+            case TimingType.GuardCharge:
                 timingCircle.CircleMaterial.color = Color.gray;
                 break;
         }

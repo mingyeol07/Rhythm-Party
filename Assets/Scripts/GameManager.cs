@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     [Header("Managers")]
     [SerializeField] private TickManager tickManager;
     private float zoomInCamCenter = 1.7f;
+    private float zoomInCharPadding = 1.5f;
 
     private Character previousZoomInCaster;
     private List<Character> previousZoomInTargets = new List<Character>();
@@ -33,11 +34,11 @@ public class GameManager : MonoBehaviour
     private Character nowSkillCaster = null;
     public Character NowSkillCaster => nowSkillCaster;
 
-
     [Header("Enemy")]
     [SerializeField] private List<Character> enemyMembers = new List<Character>();
     public List<Character> EnemyMembers => enemyMembers;
 
+    private List<Character> sortedEnemyAttackSequence = new List<Character>();
     #endregion
 
     [SerializeField] private Animator bounceAnimator;
@@ -70,6 +71,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    #region Cam
     public void ZoomInCam()
     {
         StartCoroutine(camMove.Co_MoveAttackAngle());
@@ -85,38 +87,61 @@ public class GameManager : MonoBehaviour
         Character caster = skill.Caster;
         previousZoomInCaster = caster;
 
-        StartCoroutine(caster.Co_MoveToCameraFront(-zoomInCamCenter));
+        if(skill.IsEnemySkill)
+        {
+            StartCoroutine(caster.Co_MoveToCameraFront(zoomInCamCenter));
+        }
+        else
+        {
+            StartCoroutine(caster.Co_MoveToCameraFront(-zoomInCamCenter));
+        }
     }
 
     public void ZoomInTargets(Skill skill)
     {
         previousZoomInTargets.Clear();
         skill.GetTargetIndex(out int[] targetArray, out bool isParty);
+        float centerPos = zoomInCamCenter;
+
         if (targetArray.Length > 2)
         {
-            zoomInCamCenter = 1;
+            centerPos = 1;
+        }
+
+        if (skill.IsEnemySkill)
+        {
+            for (int i = 0; i < targetArray.Length; i++)
+            {
+                Character character;
+                if (!isParty)
+                {
+                    character = partyMembers[targetArray[i]];
+                }
+                else
+                {
+                    character = enemyMembers[targetArray[i]];
+                }
+                previousZoomInTargets.Add(character);
+                StartCoroutine(character.Co_MoveToCameraFront(centerPos + (i * zoomInCharPadding)));
+            }
         }
         else
         {
-            zoomInCamCenter = 1.7f;
-        }
-
-        for (int i = 0; i < targetArray.Length; i++)
-        {
-            Character character;
-            if (!isParty)
+            for (int i = 0; i < targetArray.Length; i++)
             {
-                character = enemyMembers[targetArray[i]];
+                Character character;
+                if (!isParty)
+                {
+                    character = enemyMembers[targetArray[i]];
+                }
+                else
+                {
+                    character = partyMembers[targetArray[i]];
+                }
+                previousZoomInTargets.Add(character);
+                StartCoroutine(character.Co_MoveToCameraFront(centerPos + (i * zoomInCharPadding)));
             }
-            else
-            {
-                character = partyMembers[targetArray[i]];
-            }
-            previousZoomInTargets.Add(character);
-            StartCoroutine(character.Co_MoveToCameraFront(zoomInCamCenter + i * 1.5f));
         }
-
-        zoomInCamCenter = 1.7f;
     }
 
     public void ZoomOutCharacter()
@@ -134,9 +159,10 @@ public class GameManager : MonoBehaviour
             previousZoomInTargets[i].ReBounce();
         }
     }
+    #endregion
 
     #region Party
-    public void SetNowSkillCaster(ref Skill skill, int skillCasterIndex)
+    public void SetPartySkillCaster(ref Skill skill, int skillCasterIndex)
     {
         if(skillCasterIndex > 3)
         {
@@ -170,57 +196,32 @@ public class GameManager : MonoBehaviour
     {
         sortedPartyAttackSequence[sortedPartyIndex].CommandFailedAnimation();
     }
-
-    public void PlayPartyReBounce()
-    {
-        for(int i =0; i < partyMembers.Count; i++)
-        {
-            partyMembers[i].ReBounce();
-        }
-    }
     #endregion
 
     #region Enemy
-    public void SortEnemyMember(ref int[] enemyTicks)
+    public void SetEnemySkillCaster(ref Skill skill, int skillCasterIndex)
     {
-        //pressCount = 0;
-        //sortedEnemyAttackSequence.Clear();
-        //sortedEnemyWithSpeed.Clear();
+        if (skillCasterIndex > 3)
+        {
+            nowSkillCaster = null;
+            skill = null;
+            return;
+        }
 
-        //// 스피드 순서대로 정렬된 파티
-        //for (int i = 0; i < enemyMembers.Count; i++)
-        //{
-        //    sortedEnemyWithSpeed.Add(enemyMembers[i].GetComponent<Enemy>());
-        //}
-        //sortedEnemyWithSpeed.Sort((a, b) => b.Speed.CompareTo(a.Speed));
+        nowSkillCaster = sortedEnemyAttackSequence[skillCasterIndex];
+        skill = nowSkillCaster.NextSkill;
+    }
 
-        //for (int i = 0; i < 4; i++)
-        //{
-        //    List<Enemy> characterList = new List<Enemy>();
-        //    sortedEnemyAttackSequence.Add(characterList);
-        //}
+    public void SortEnemyMember()
+    {
+        sortedEnemyAttackSequence.Clear();
+        sortedEnemyAttackSequence = new List<Character>(enemyMembers);
+        sortedEnemyAttackSequence.Sort((a, b) => b.Speed.CompareTo(a.Speed));
 
-        //// Enemy는 자기맘대로 여러번 공격도 가능함.
-        //// Enemy들의 공격 순서를 어떻게 해야할지가 문제
-        //// 일단 스피드가 빠른 순서대로 정렬하고
-        //// 순회하며 각자 예약된 스킬Queue를 가져와 하나만 빼서 실행하여 
-        //// 빠른순서대로 번갈아가며실행
-
-        //for (int i = 0; i < sortedEnemyWithSpeed.Count; i++)
-        //{
-        //    for(int j =0; j < sortedEnemyWithSpeed[i].PreparedSkills.Count; j++)
-        //    {
-        //       // sortedEnemyAttackSequence[sortedEnemyWithSpeed[i].PreparedSkills[j].Turn].Add(sortedEnemyWithSpeed[i]);
-        //    }
-        //}
-
-        //// 아이템에 의한 공격 기회 추가
-        //EnemyAdditionalAttackChance?.Invoke();
-        //EnemyAdditionalAttackChance = null;
-
-        ////sortedPartyGuardSequence
-        ////sortedEnemyAttackSequence
-        //enemyTicks = new int[sortedEnemyWithSpeed.Count];
+        for(int i =0; i < sortedEnemyAttackSequence.Count; i++)
+        {
+            sortedEnemyAttackSequence[i].SetNextSkill(0);
+        }
     }
     #endregion Enemy
 
@@ -230,37 +231,14 @@ public class GameManager : MonoBehaviour
         Character member;
         Accuracy accuracy;
 
-        if (tickManager.TickCount > 16 && nowSkillCaster != null)
-        {
-            member = nowSkillCaster;
-            CircleSpawner spawner = member.CircleManager.GetCircleSpawner(myInputArrow);
-
-            if (spawner.ReduceCircleQueue.TryPeek(out ReduceCircle circle))
-            {
-                if (myInputArrow != circle.ArrowType)
-                {
-                    accuracy = Accuracy.Miss;
-                }
-                else
-                {
-                    accuracy = tickManager.GetAccuracy(circle.TargetTick);
-                }
-
-                member.AttackCommand(accuracy, circle.ArrowType);
-            }
-            else
-            {
-                member.AttackCommand(Accuracy.Miss, myInputArrow);
-            }
-        }
-        else
+        if (tickManager.TurnState == TurnState.PlayerCommanding)
         {
             if (pressCount >= sortedPartyAttackSequence.Count)
                 return;
             int skillIndex = (int)myInputArrow;
 
             member = sortedPartyAttackSequence[pressCount];
-            while(member.GetFirstCircleInSpawner(Arrow.Up) == null)
+            while (member.GetFirstCircleInSpawner(Arrow.Up) == null)
             {
                 pressCount++;
                 if (pressCount > 3) return;
@@ -270,6 +248,28 @@ public class GameManager : MonoBehaviour
             member.SkillCommand(accuracy, skillIndex);
 
             pressCount++;
+        }
+        else if (tickManager.TurnState == TurnState.PlayerAttacking)
+        {
+            member = nowSkillCaster;
+            CircleSpawner spawner = member.CircleManager.GetCircleSpawner(myInputArrow);
+
+            if (spawner.ReduceCircleQueue.TryPeek(out ReduceCircle circle))
+            {
+                accuracy = tickManager.GetAccuracy(circle.TargetTick);
+
+                member.AttackCommand(accuracy, circle.ArrowType);
+            }
+            else
+            {
+                circle = member.CircleManager.TryPeekSpawnerCircle();
+
+                member.AttackCommand(Accuracy.Miss, circle.ArrowType);
+            }
+        }
+        else if (tickManager.TurnState == TurnState.EnemyAttacking)
+        {
+            
         }
     }
     #endregion

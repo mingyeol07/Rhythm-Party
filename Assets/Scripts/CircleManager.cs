@@ -36,6 +36,19 @@ public class CircleManager : MonoBehaviour
         return circleSpawners[(int)arrow];
     }
 
+    public ReduceCircle TryPeekSpawnerCircle()
+    {
+        for(int i = 0;  i  < circleSpawners.Length; i++)
+        {
+            if(circleSpawners[i].ReduceCircleQueue.TryPeek(out ReduceCircle circle))
+            {
+                return circle;
+            }
+        }
+
+        return null;
+    }
+
     public void SpawnReduceCircle(double currentTime, double nextTime, Arrow arrow, TimingType type, int targetTick)
     {
         circleSpawnCount++;

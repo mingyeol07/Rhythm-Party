@@ -60,6 +60,7 @@ public class TickManager : MonoBehaviour
 
     // 턴
     private TurnState turnState = TurnState.None;
+    public TurnState TurnState => turnState;
     private bool changeSkillCasterFlag = false;
     private int attackCharacterIndexCount = 0;
 
@@ -72,7 +73,10 @@ public class TickManager : MonoBehaviour
     private int attackCommandAfterWaitCount;
 
     private Queue<Note> noteQueue = new Queue<Note>();
-    private Dictionary<int, Arrow> tickDict = new Dictionary<int, Arrow>();
+    private Dictionary<int, Arrow> noteDict = new Dictionary<int, Arrow>();
+    private Dictionary<int, Arrow> longNoteExitDict = new Dictionary<int, Arrow>();
+
+    private GameManager gameManager;
 
     private void Start()
     {
@@ -81,6 +85,12 @@ public class TickManager : MonoBehaviour
 
         circleWaitTimeTwo = aBeat * circleWaitTickTwo;
         circleWaitTimeOne = aBeat * circleWaitTickOne;
+
+        gameManager = GameManager.Instance;
+
+        // test
+
+        turnState = TurnState.PlayerCommanding;
     }
 
     private void Update()
@@ -97,7 +107,7 @@ public class TickManager : MonoBehaviour
             if(tickCount % 2 != 0)
             {
                 // 정박이라면 (홀수가 정박)
-                GameManager.Instance.BounceAnimation();
+                gameManager.BounceAnimation();
             }
         }
     }
@@ -112,35 +122,48 @@ public class TickManager : MonoBehaviour
 
         tickCount++;
 
-        // 플레이어의 어택커맨드 타이밍인 5,6,7,8의 1초 전에 미리 서클애니메이션 진행
-        if(tickCount == 5)
+        if(turnState == TurnState.PlayerCommanding)
         {
-            tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            GameManager.Instance.PlayPartyTimingCircle(0, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
-        }
-        if (tickCount == 7)
-        {
-            tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            GameManager.Instance.PlayPartyTimingCircle(1, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
-        }
-        if (tickCount == 9)
-        {
-            tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            GameManager.Instance.PlayPartyTimingCircle(2, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
-        }
-        if (tickCount == 11)
-        {
-            tickDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            GameManager.Instance.PlayPartyTimingCircle(3, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
+            PartyCommand();
         }
 
-        if(turnState == TurnState.PlayerAttacking)
+        if (turnState == TurnState.EnemyCommanding)
         {
-            PartyCommandAttack();
+            EnemyAttack();
+        }
+
+        if (turnState == TurnState.PlayerAttacking)
+        {
+            PartyAttack();
         }
     }
    
-    private void PartyCommandAttack()
+    private void PartyCommand()
+    {
+        // 플레이어의 어택커맨드 타이밍인 5,6,7,8의 1초 전에 미리 서클애니메이션 진행
+        if (tickCount == 5)
+        {
+            noteDict.Add(tickCount + circleWaitTickOne, Arrow.None);
+            gameManager.PlayPartyTimingCircle(0, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
+        }
+        if (tickCount == 7)
+        {
+            noteDict.Add(tickCount + circleWaitTickOne, Arrow.None);
+            gameManager.PlayPartyTimingCircle(1, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
+        }
+        if (tickCount == 9)
+        {
+            noteDict.Add(tickCount + circleWaitTickOne, Arrow.None);
+            gameManager.PlayPartyTimingCircle(2, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
+        }
+        if (tickCount == 11)
+        {
+            noteDict.Add(tickCount + circleWaitTickOne, Arrow.None);
+            gameManager.PlayPartyTimingCircle(3, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
+        }
+    }
+
+    private void PartyAttack()
     {
         if (attackCommandAfterWaitCount > 0)
         {
@@ -150,32 +173,44 @@ public class TickManager : MonoBehaviour
 
         if (!changeSkillCasterFlag)
         {
-            GameManager.Instance.SetNowSkillCaster(ref castingSkill, attackCharacterIndexCount);
+            gameManager.SetPartySkillCaster(ref castingSkill, attackCharacterIndexCount);
 
-            if (GameManager.Instance.NowSkillCaster == null)
+            if (gameManager.NowSkillCaster == null)
             {
-                GameManager.Instance.ZoomOutCharacter();
-                GameManager.Instance.ZoomOutTargets();
-                turnState = TurnState.EnemyCommanding;
+                gameManager.ZoomOutCharacter();
+                gameManager.ZoomOutTargets();
+                gameManager.ZoomOutCam();
 
-                GameManager.Instance.ZoomOutCam();
+                gameManager.SortEnemyMember();
+                turnState = TurnState.EnemyCommanding;
+                attackCharacterIndexCount = 0;
+                changeSkillCasterFlag = false;
+
+                if (tickCount % 2 != 0)
+                {
+                    attackCommandAfterWaitCount = 5;
+                }
+                else
+                {
+                    attackCommandAfterWaitCount = 4;
+                }
                 return;
             }
 
             if(castingSkill != null)
             {
-                GameManager.Instance.ZoomOutCharacter();
-                GameManager.Instance.ZoomInCharacter(castingSkill);
+                gameManager.ZoomOutCharacter();
+                gameManager.ZoomInCharacter(castingSkill);
 
-                GameManager.Instance.ZoomOutTargets();
-                GameManager.Instance.ZoomInTargets(castingSkill);
+                gameManager.ZoomOutTargets();
+                gameManager.ZoomInTargets(castingSkill);
 
                 GameManager.Instance.ZoomInCam();
                 castingSkill.GetSkillCommandList(ref noteQueue);
             }
             else
             {
-                GameManager.Instance.ZoomOutCam();
+                gameManager.ZoomOutCam();
             }
 
             changeSkillCasterFlag = true;
@@ -193,9 +228,16 @@ public class TickManager : MonoBehaviour
             Note note = noteQueue.Dequeue();
             if (note.Dir != Arrow.None)
             {
-                tickDict.Add(tickCount + circleWaitTickOne, note.Dir);
+                if(note.Type == NoteType.Long)
+                {
+                    longNoteExitDict.Add(tickCount + circleWaitTickOne + note.NoteTime, note.Dir);
+                }
+                else
+                {
+                    noteDict.Add(tickCount + circleWaitTickOne, note.Dir);
+                }
 
-                GameManager.Instance.PlayPartyTimingCircle(
+                gameManager.PlayPartyTimingCircle (
                     attackCharacterIndexCount, 
                     realCurrentTime, circleWaitTimeOne, 
                     note.Dir, TimingType.Attack, note.Type, 
@@ -204,7 +246,7 @@ public class TickManager : MonoBehaviour
         }
         else
         {
-             GameManager.Instance.ShowCommandFailed(attackCharacterIndexCount);
+             gameManager.ShowCommandFailed(attackCharacterIndexCount);
         }
 
         if (noteQueue.Count == 0)
@@ -226,21 +268,116 @@ public class TickManager : MonoBehaviour
         }
     }
 
+    private void EnemyAttack()
+    {
+        if (attackCommandAfterWaitCount > 0)
+        {
+            attackCommandAfterWaitCount--;
+            return;
+        }
+
+        if (!changeSkillCasterFlag)
+        {
+            gameManager.SetEnemySkillCaster(ref castingSkill, attackCharacterIndexCount);
+
+            if (gameManager.NowSkillCaster == null)
+            {
+                gameManager.ZoomOutCharacter();
+                gameManager.ZoomOutTargets();
+                gameManager.ZoomOutCam();
+
+                turnState = TurnState.Ready;
+                return;
+            }
+
+            if (castingSkill != null)
+            {
+                gameManager.ZoomOutCharacter();
+                gameManager.ZoomInCharacter(castingSkill);
+
+                gameManager.ZoomOutTargets();
+                gameManager.ZoomInTargets(castingSkill);
+
+                gameManager.ZoomInCam();
+
+                castingSkill.GetSkillCommandList(ref noteQueue);
+            }
+            else
+            {
+                gameManager.ZoomOutCam();
+            }
+
+            changeSkillCasterFlag = true;
+            attackCommandBeforeWaitCount = 4;
+        }
+
+        if (attackCommandBeforeWaitCount > 0)
+        {
+            attackCommandBeforeWaitCount--;
+            return;
+        }
+
+        if (castingSkill != null)
+        {
+            Note note = noteQueue.Dequeue();
+
+            castingSkill.GetTargetIndex(out int[] arr, out bool isPartyTarget);
+
+            if (isPartyTarget) return;
+
+            if (note.Dir != Arrow.None)
+            {
+                if (note.Type == NoteType.Long)
+                {
+                    longNoteExitDict.Add(tickCount + circleWaitTickOne + note.NoteTime, note.Dir);
+                }
+                else
+                {
+                    noteDict.Add(tickCount + circleWaitTickOne, note.Dir);
+                }
+
+                gameManager.PlayPartyTimingCircle(
+                    arr[0],
+                    realCurrentTime, circleWaitTimeOne,
+                    note.Dir, TimingType.Attack, note.Type,
+                    tickCount + circleWaitTickOne);
+            }
+        }
+
+        if (noteQueue.Count == 0)
+        {
+            changeSkillCasterFlag = false;
+            attackCharacterIndexCount++;
+
+            if (castingSkill == null)
+                return;
+
+            if (tickCount % 2 != 0)
+            {
+                attackCommandAfterWaitCount = 5;
+            }
+            else
+            {
+                attackCommandAfterWaitCount = 4;
+            }
+        }
+    }
+
     public Accuracy GetAccuracy(int targetTick)
     {
-        if (!tickDict.ContainsKey(targetTick))
+        if (!noteDict.ContainsKey(targetTick))
         {
             return Accuracy.Miss;
         }
-      
-        if (tickCount < targetTick - 1)
+
+        if (tickCount < targetTick)
         {
             return Accuracy.Miss;
         }
 
         double time = 0;
         double beat = 0;
-        if(targetTick % 2 != 0)
+        if (targetTick % 2 != 0)
         {
             time = currentTime;
             beat = aBeat;
@@ -250,22 +387,41 @@ public class TickManager : MonoBehaviour
             time = realCurrentTime;
             beat = realbeat;
         }
+
+        if (tickCount == targetTick + 1)
+        {
+            if (Mathf.Abs((float)(time - beat)) <= criticalTolerance)
+            {
+                return Accuracy.Critical;
+            }
+            else if (Mathf.Abs((float)(time - beat)) <= strikeTolerance)
+            {
+                return Accuracy.Strike;
+            }
+            else if (Mathf.Abs((float)(time - beat)) <= hitTolerance)
+            {
+                return Accuracy.Hit;
+            }
+        }
+        else if(tickCount == targetTick + 2)
+        {
+            if (Mathf.Abs((float)time) <= criticalTolerance)
+            {
+                return Accuracy.Critical;
+            }
+            else if (Mathf.Abs((float)time) <= strikeTolerance)
+            {
+                return Accuracy.Strike;
+            }
+            else if (Mathf.Abs((float)time) <= hitTolerance)
+            {
+                return Accuracy.Hit;
+            }
+        }
+
         // 5/5가 다음 틱이라면
         // Mathf.Abs((float)(currentTime - 60d / bpm)) 다음 틱에 얼마나 근접햇는지 4/5
         // Mathf.Abs((float)currentTime) <= tolerance 이전틱에서 얼마나 지나쳤는지 6/5
-
-        if (Mathf.Abs((float)time) <= criticalTolerance || Mathf.Abs((float)(time - beat)) <= criticalTolerance)
-        {
-            return Accuracy.Critical;
-        }
-        else if (Mathf.Abs((float)time) <= strikeTolerance || Mathf.Abs((float)(time - beat)) <= strikeTolerance)
-        {
-            return Accuracy.Strike;
-        }
-        else if (Mathf.Abs((float)time) <= hitTolerance || Mathf.Abs((float)(time - beat)) <= hitTolerance)
-        {
-            return Accuracy.Hit;
-        }
 
         return Accuracy.Miss;
     }

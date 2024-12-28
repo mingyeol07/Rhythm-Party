@@ -5,31 +5,32 @@ using System.Collections.Generic;
 // # Unity
 using UnityEngine;
 
-public class ElectricStorm : Skill
+public class Axe : Skill
 {
-    public ElectricStorm(Character caster) : base(caster) { }
+    public Axe(Character caster) : base(caster) { }
 
     public override void Activate(int damage)
     {
-        for(int i = 0; i< GameManager.Instance.EnemyMembers.Count; i++)
+        for (int i = 0; i < GameManager.Instance.PartyMembers.Count; i++)
         {
-            GameManager.Instance.EnemyMembers[i].Damaged(damage);
+            GameManager.Instance.PartyMembers[i].Damaged(damage);
         }
     }
 
     public override void SetCommand()
     {
-        damage = 40;
+        isEnemySkill = true;
+
+        isPartyTarget = true;
+
+        damage = 20;
+
+        targetIndex = new int[] { 0, 2, 3 };
 
         skillCommandList = new Note[]
-        {
+{
              new Note(Arrow.Down, NoteType.Short, 2),
              new Note(Arrow.Down, NoteType.Short, 10),
-        };
-
-        targetIndex = new int[]
-        {
-            0,1,2,3,
-        };
+};
     }
 }

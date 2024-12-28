@@ -169,7 +169,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6669176529104141797}
-  - component: {fileID: 6669176529104141799}
+  - component: {fileID: 5174264469271045100}
   m_Layer: 0
   m_Name: Magicion
   m_TagString: Untagged
@@ -194,7 +194,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6669176529104141799
+--- !u!114 &5174264469271045100
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -203,13 +203,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 6669176529104141796}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 816f982cf0a759c429f113c8c3266445, type: 3}
+  m_Script: {fileID: 11500000, guid: 6f80be1544f0c8f4d8f49683b7bb28b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 2
   circleManager: {fileID: 1765533564753159758}
   animator: {fileID: 6669176528784270180}
   bounceAnimator: {fileID: 6349488734322284573}
+  spriteRenderer: {fileID: 6669176528784270181}
   damageText: {fileID: 3211070822415293098}
   commandFailedAnimator: {fileID: 8050643738923170169}
 --- !u!1001 &6669176528112554243

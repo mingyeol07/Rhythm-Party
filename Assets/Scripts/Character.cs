@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
-    private Skill[] skills = new Skill[4];
+    protected Skill[] skills = new Skill[4];
 
     private int hp = 999;
     [SerializeField] private int speed;
@@ -24,6 +24,7 @@ public class Character : MonoBehaviour
     public CircleManager CircleManager => circleManager;
     [SerializeField] private Animator animator;
     [SerializeField] private Animator bounceAnimator;
+    [SerializeField] private SpriteRenderer spriteRenderer;
 
     [Header("UI")]
     [SerializeField] private DamageText damageText;
@@ -43,16 +44,6 @@ public class Character : MonoBehaviour
     private readonly int hashTrigAtkUp = Animator.StringToHash("AttackUp");
     private readonly int hashTrigAtkDown = Animator.StringToHash("AttackDown");
     private readonly int hashTrigAtkRight = Animator.StringToHash("AttackRight");
-
-    private void Awake()
-    {
-        skills = new Skill[4];
-
-        skills[0] = new ElectricStorm(this);
-        skills[1] = new ElectricStorm(this);
-        skills[2] = new ElectricStorm(this);
-        skills[3] = new ElectricStorm(this);
-    }
 
     private void Start()
     {
@@ -139,6 +130,11 @@ public class Character : MonoBehaviour
         nextSkill = skills[skillIndex];
     }
 
+    public void SetNextSkill(int skillIndex)
+    {
+        nextSkill = skills[skillIndex];
+    }
+
     public void CommandFailedAnimation()
     {
         commandFailedAnimator.SetTrigger(hashTrigCommandFailed);
@@ -146,6 +142,7 @@ public class Character : MonoBehaviour
 
     public IEnumerator Co_MoveToCameraFront(float x)
     {
+        spriteRenderer.sortingOrder = 1;
         isMoveToCam = true;
 
         Vector3 endPos = new Vector3(x, 0.5f, 0);
@@ -170,6 +167,8 @@ public class Character : MonoBehaviour
 
     public IEnumerator Co_ReturnToInPlace()
     {
+        spriteRenderer.sortingOrder = 0;
+
         Vector3 nowPos = transform.position;
         Vector3 nowScale = new Vector3(1.5f, 1.5f, 1.5f);
 

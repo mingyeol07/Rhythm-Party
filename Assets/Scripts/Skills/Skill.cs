@@ -11,15 +11,24 @@ public abstract class Skill
 {
     protected int damage;
     protected int[] targetIndex; // 0, 1, 2, 3?
-    protected Note[] skillCommandList;
-    protected Character caster;
+
     protected bool isPartyTarget = false;
+    protected bool isEnemySkill = false;
+    public bool IsEnemySkill => isEnemySkill;
+
+    protected Note[] skillCommandList;
+
+    protected Character caster;
     public Character Caster => caster;
 
     /// <summary>
     /// 스킬 구현
     /// </summary>
     public abstract void Activate(int damage);
+
+    /// <summary>
+    /// 타겟인덱스와 커맨드리스트, 데미지를 초기화해주세요
+    /// </summary>
     public abstract void SetCommand();
 
     public void GetSkillCommandList(ref Queue<Note> queue)
@@ -29,10 +38,10 @@ public abstract class Skill
             queue.Enqueue(skillCommandList[i]);
         }
     }
-    public void GetTargetIndex(out int[] arr, out bool isParty)
+    public void GetTargetIndex(out int[] arr, out bool isPartyTarget)
     {
         arr = targetIndex;
-        isParty = isPartyTarget;
+        isPartyTarget = this.isPartyTarget;
     }
     public Skill(Character caster)
     {

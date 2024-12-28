@@ -170,6 +170,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2380415827916210474}
   - component: {fileID: 2380415827916210475}
+  - component: {fileID: 1707380069044072615}
   m_Layer: 0
   m_Name: Goblin_Captain
   m_TagString: Untagged
@@ -210,6 +211,26 @@ MonoBehaviour:
   circleManager: {fileID: 7279273090031071972}
   animator: {fileID: 2380415827578659725}
   bounceAnimator: {fileID: 8765992874639001482}
+  spriteRenderer: {fileID: 2380415827578659726}
+  damageText: {fileID: 5842647305409777152}
+  commandFailedAnimator: {fileID: 1314174716734631379}
+--- !u!114 &1707380069044072615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2380415827916210473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 819353218f4326b4ca6e60996bc76e7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 0
+  circleManager: {fileID: 7279273090031071972}
+  animator: {fileID: 2380415827578659725}
+  bounceAnimator: {fileID: 8765992874639001482}
+  spriteRenderer: {fileID: 2380415827578659726}
   damageText: {fileID: 5842647305409777152}
   commandFailedAnimator: {fileID: 1314174716734631379}
 --- !u!1001 &2380415826478826921

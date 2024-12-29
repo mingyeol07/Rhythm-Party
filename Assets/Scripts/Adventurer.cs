@@ -7,13 +7,15 @@ using UnityEngine;
 
 public class Adventurer : Character
 {
-    private void Awake()
+    protected override void Start()
     {
-        skills = new Skill[4];
+        base.Start();
 
-        skills[0] = new ElectricStorm(this);
-        skills[1] = new ElectricStorm(this);
-        skills[2] = new ElectricStorm(this);
-        skills[3] = new ElectricStorm(this);
+        base.skills = new Skill[4];
+
+        base.skills[0] = new ElectricStorm(this);
+        base.skills[1] = new ElectricStorm(this);
+        base.skills[2] = new ElectricStorm(this);
+        base.skills[3] = new ElectricStorm(this);
     }
 }

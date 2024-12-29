@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class Character : MonoBehaviour
 {
-    protected Skill[] skills = new Skill[4];
+    protected Skill[] skills;
 
     private int hp = 999;
     [SerializeField] private int speed;
@@ -38,16 +38,25 @@ public class Character : MonoBehaviour
 
     private readonly int hashTrigExit = Animator.StringToHash("Exit");
     private readonly int hashTrigCommand = Animator.StringToHash("Command");
-    private readonly int hashTrigDamage= Animator.StringToHash("Damage");
+    private readonly int hashTrigDamage = Animator.StringToHash("Damage");
 
     private readonly int hashTrigAtkLeft = Animator.StringToHash("AttackLeft");
     private readonly int hashTrigAtkUp = Animator.StringToHash("AttackUp");
     private readonly int hashTrigAtkDown = Animator.StringToHash("AttackDown");
     private readonly int hashTrigAtkRight = Animator.StringToHash("AttackRight");
 
-    private void Start()
+    protected virtual void Start()
     {
         defaultPosition = transform.position;
+    }
+
+    private void Update()
+    {
+        for (int i = 0; i < skills.Length; i++)
+        {
+            Debug.Log(gameObject.name);
+            Debug.Log(skills[i]);
+        }
     }
 
     public void Damaged(int damage)
@@ -69,7 +78,7 @@ public class Character : MonoBehaviour
 
     private void Attack(Accuracy accuracy)
     {
-        if(nextSkill == null)
+        if (nextSkill == null)
         {
             return;
         }
@@ -90,7 +99,7 @@ public class Character : MonoBehaviour
 
     public ReduceCircle GetFirstCircleInSpawner(Arrow arrow)
     {
-        if(circleManager.GetCircleSpawner(arrow).ReduceCircleQueue.Count > 0)
+        if (circleManager.GetCircleSpawner(arrow).ReduceCircleQueue.Count > 0)
         {
             return circleManager.GetCircleSpawner(arrow).ReduceCircleQueue.Peek();
         }
@@ -121,13 +130,18 @@ public class Character : MonoBehaviour
         Attack(accuracy);
     }
 
+    public void GuardCommand(Accuracy accuracy, Arrow arrow)
+    {
+        circleManager.PressedAttackCommand(accuracy, arrow);
+    }
+
     public void SkillCommand(Accuracy accuracy, int skillIndex)
     {
         animator.SetTrigger(hashTrigCommand);
         circleManager.PressedCommand(accuracy);
 
         // 스킬 세팅
-        nextSkill = skills[skillIndex];
+        SetNextSkill(skillIndex);
     }
 
     public void SetNextSkill(int skillIndex)
@@ -142,7 +156,7 @@ public class Character : MonoBehaviour
 
     public IEnumerator Co_MoveToCameraFront(float x)
     {
-        spriteRenderer.sortingOrder = 1;
+        spriteRenderer.sortingLayerName = "ZoomInCharacter";
         isMoveToCam = true;
 
         Vector3 endPos = new Vector3(x, 0.5f, 0);
@@ -167,7 +181,7 @@ public class Character : MonoBehaviour
 
     public IEnumerator Co_ReturnToInPlace()
     {
-        spriteRenderer.sortingOrder = 0;
+        spriteRenderer.sortingLayerName = "Character";
 
         Vector3 nowPos = transform.position;
         Vector3 nowScale = new Vector3(1.5f, 1.5f, 1.5f);

@@ -169,7 +169,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2380415827916210474}
-  - component: {fileID: 2380415827916210475}
   - component: {fileID: 1707380069044072615}
   m_Layer: 0
   m_Name: Goblin_Captain
@@ -195,25 +194,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2380415827916210475
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2380415827916210473}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 816f982cf0a759c429f113c8c3266445, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  speed: 0
-  circleManager: {fileID: 7279273090031071972}
-  animator: {fileID: 2380415827578659725}
-  bounceAnimator: {fileID: 8765992874639001482}
-  spriteRenderer: {fileID: 2380415827578659726}
-  damageText: {fileID: 5842647305409777152}
-  commandFailedAnimator: {fileID: 1314174716734631379}
 --- !u!114 &1707380069044072615
 MonoBehaviour:
   m_ObjectHideFlags: 0

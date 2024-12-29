@@ -21,7 +21,7 @@ public class Axe : Skill
     {
         isEnemySkill = true;
 
-        isPartyTarget = true;
+        isPartyTarget = false;
 
         damage = 20;
 

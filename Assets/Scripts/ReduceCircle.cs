@@ -175,17 +175,17 @@ public class ReduceCircle : MonoBehaviour
 
         while (reduceCircleColor.a > 0f)
         {
-            reduceCircleColor.a -= Time.deltaTime * 4f;
+            reduceCircleColor.a -= Time.deltaTime * 4.5f;
             circleMaterial.SetColor(materialColorName, reduceCircleColor);
 
             if (img_arrow != null)
             {
-                arrowColor.a -= Time.deltaTime * 4f;
+                arrowColor.a -= Time.deltaTime * 4.5f;
                 img_arrow.color = arrowColor;
             }
             if (txt_count != null)
             {
-                countColor.a -= Time.deltaTime * 4f;
+                countColor.a -= Time.deltaTime * 4.5f;
                 txt_count.color = countColor;
             }
 

@@ -127,14 +127,14 @@ public class TickManager : MonoBehaviour
             PartyCommand();
         }
 
-        if (turnState == TurnState.EnemyCommanding)
-        {
-            EnemyAttack();
-        }
-
         if (turnState == TurnState.PlayerAttacking)
         {
             PartyAttack();
+        }
+
+        if (turnState == TurnState.EnemyCommanding)
+        {
+            EnemyAttack();
         }
     }
    
@@ -144,22 +144,22 @@ public class TickManager : MonoBehaviour
         if (tickCount == 5)
         {
             noteDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            gameManager.PlayPartyTimingCircle(0, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
+            gameManager.PlaySortedPartyTimingCircle(0, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
         }
         if (tickCount == 7)
         {
             noteDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            gameManager.PlayPartyTimingCircle(1, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
+            gameManager.PlaySortedPartyTimingCircle(1, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
         }
         if (tickCount == 9)
         {
             noteDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            gameManager.PlayPartyTimingCircle(2, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
+            gameManager.PlaySortedPartyTimingCircle(2, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
         }
         if (tickCount == 11)
         {
             noteDict.Add(tickCount + circleWaitTickOne, Arrow.None);
-            gameManager.PlayPartyTimingCircle(3, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
+            gameManager.PlaySortedPartyTimingCircle(3, realCurrentTime, circleWaitTimeOne, Arrow.Up, TimingType.Command, NoteType.Short, tickCount + circleWaitTickOne);
         }
     }
 
@@ -237,7 +237,7 @@ public class TickManager : MonoBehaviour
                     noteDict.Add(tickCount + circleWaitTickOne, note.Dir);
                 }
 
-                gameManager.PlayPartyTimingCircle (
+                gameManager.PlaySortedPartyTimingCircle(
                     attackCharacterIndexCount, 
                     realCurrentTime, circleWaitTimeOne, 
                     note.Dir, TimingType.Attack, note.Type, 

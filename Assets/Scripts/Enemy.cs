@@ -7,13 +7,15 @@ using UnityEngine;
 
 public class Enemy : Character
 {
-    private void Awake()
+    protected override void Start()
     {
-        skills = new Skill[4];
+        base.Start();
 
-        skills[0] = new Axe(this);
-        skills[1] = new Axe(this);
-        skills[2] = new Axe(this);
-        skills[3] = new Axe(this);
+        base.skills = new Skill[4];
+
+        base.skills[0] = new Axe(this);
+        base.skills[1] = new Axe(this);
+        base.skills[2] = new Axe(this);
+        base.skills[3] = new Axe(this);
     }
 }

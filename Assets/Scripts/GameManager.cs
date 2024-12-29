@@ -1,16 +1,8 @@
 // # Systems
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor.PackageManager;
-
-
 
 // # Unity
 using UnityEngine;
-using UnityEngine.TextCore.Text;
 
 public class GameManager : MonoBehaviour
 {
@@ -113,16 +105,20 @@ public class GameManager : MonoBehaviour
             for (int i = 0; i < targetArray.Length; i++)
             {
                 Character character;
+                int pm = 1;
+
                 if (!isParty)
                 {
                     character = partyMembers[targetArray[i]];
+                    pm = -1;
                 }
                 else
                 {
                     character = enemyMembers[targetArray[i]];
+                    pm = 1;
                 }
                 previousZoomInTargets.Add(character);
-                StartCoroutine(character.Co_MoveToCameraFront(centerPos + (i * zoomInCharPadding)));
+                StartCoroutine(character.Co_MoveToCameraFront(pm *( centerPos + (i * zoomInCharPadding))));
             }
         }
         else
@@ -185,11 +181,18 @@ public class GameManager : MonoBehaviour
         sortedPartyAttackSequence.Sort((a, b) => b.Speed.CompareTo(a.Speed));
     }
 
-    public void PlayPartyTimingCircle(int sortedPartyIndex, double startTime, double endTime, Arrow arrow, TimingType timingType, NoteType noteType, int targetTick)
+    public void PlaySortedPartyTimingCircle(int sortedPartyIndex, double startTime, double endTime, Arrow arrow, TimingType timingType, NoteType noteType, int targetTick)
     {
         if (sortedPartyIndex >= sortedPartyAttackSequence.Count) return;
 
         sortedPartyAttackSequence[sortedPartyIndex].CircleManager.SpawnReduceCircle(startTime, endTime, arrow, timingType, targetTick);
+    }
+
+    public void PlayPartyTimingCircle(int sortedPartyIndex, double startTime, double endTime, Arrow arrow, TimingType timingType, NoteType noteType, int targetTick)
+    {
+        if (sortedPartyIndex >= partyMembers.Count) return;
+
+        partyMembers[sortedPartyIndex].CircleManager.SpawnReduceCircle(startTime, endTime, arrow, timingType, targetTick);
     }
 
     public void ShowCommandFailed(int sortedPartyIndex)
@@ -267,9 +270,36 @@ public class GameManager : MonoBehaviour
                 member.AttackCommand(Accuracy.Miss, circle.ArrowType);
             }
         }
-        else if (tickManager.TurnState == TurnState.EnemyAttacking)
+        else if (tickManager.TurnState == TurnState.EnemyCommanding)
         {
-            
+            nowSkillCaster.NextSkill.GetTargetIndex(out int[] arr, out bool isPartyTarget);
+
+            if(isPartyTarget)
+            {
+
+            }
+            else
+            {
+                member = partyMembers[arr[0]];
+                CircleSpawner spawner = member.CircleManager.GetCircleSpawner(myInputArrow);
+
+                if (spawner.ReduceCircleQueue.TryPeek(out ReduceCircle circle))
+                {
+                    
+                    accuracy = tickManager.GetAccuracy(circle.TargetTick);
+
+                    for (int i = 0; i < arr.Length; i++)
+                    {
+                        partyMembers[arr[i]].GuardCommand(accuracy, circle.ArrowType);
+                    }
+                }
+                else
+                {
+                    circle = member.CircleManager.TryPeekSpawnerCircle();
+
+                    member.AttackCommand(Accuracy.Miss, circle.ArrowType);
+                }
+            }
         }
     }
     #endregion

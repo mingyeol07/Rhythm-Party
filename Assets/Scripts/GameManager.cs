@@ -64,14 +64,14 @@ public class GameManager : MonoBehaviour
     }
 
     #region Cam
-    public void ZoomInCam()
+    public void ZoomInCam(int sign)
     {
-        StartCoroutine(camMove.Co_MoveAttackAngle());
+        StartCoroutine(camMove.Co_MoveAttackAngle(sign));
     }
 
-    public void ZoomOutCam()
+    public void ZoomOutCam(int sign)
     {
-        StartCoroutine(camMove.Co_MoveDefaultAngle());
+        StartCoroutine(camMove.Co_MoveDefaultAngle(sign));
     }
 
     public void ZoomInCharacter(Skill skill)
@@ -232,7 +232,7 @@ public class GameManager : MonoBehaviour
     public void PressedKey(Arrow myInputArrow)
     {
         Character member;
-        Accuracy accuracy;
+        Accuracy accuracy = Accuracy.None;
 
         if (tickManager.TurnState == TurnState.PlayerCommanding)
         {
@@ -287,19 +287,22 @@ public class GameManager : MonoBehaviour
                 {
                     
                     accuracy = tickManager.GetAccuracy(circle.TargetTick);
+                    partyMembers[arr[0]].GuardCommand(accuracy, circle.ArrowType);
 
-                    for (int i = 0; i < arr.Length; i++)
+                    for (int i = 1; i < arr.Length; i++)
                     {
-                        partyMembers[arr[i]].GuardCommand(accuracy, circle.ArrowType);
+                        partyMembers[arr[i]].GuardAnim();
                     }
                 }
                 else
                 {
                     circle = member.CircleManager.TryPeekSpawnerCircle();
 
-                    member.AttackCommand(Accuracy.Miss, circle.ArrowType);
+                    member.GuardCommand(Accuracy.Miss, circle.ArrowType);
                 }
             }
+
+            nowSkillCaster.Attack(accuracy);
         }
     }
     #endregion

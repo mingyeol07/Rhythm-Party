@@ -14,9 +14,9 @@ public class CamMoving : MonoBehaviour
         cam = GetComponent<Camera>();
     }
 
-    public IEnumerator Co_MoveAttackAngle()
+    public IEnumerator Co_MoveAttackAngle(int sign)
     {
-        Vector3 endRot = new Vector3(0, 0, 3);
+        Vector3 endRot = new Vector3(0, 0, 3 * sign);
         float maxTime = 0.2f;
         float time = 0;
 
@@ -32,9 +32,9 @@ public class CamMoving : MonoBehaviour
         transform.eulerAngles = endRot;
     }
 
-    public IEnumerator Co_MoveDefaultAngle()
+    public IEnumerator Co_MoveDefaultAngle(int sign)
     {
-        Vector3 startRot = new Vector3(0, 0, 3);
+        Vector3 startRot = new Vector3(0, 0, 3 * sign);
         float maxTime = 0.2f;
         float time = 0;
 

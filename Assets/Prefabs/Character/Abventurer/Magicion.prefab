@@ -323,7 +323,7 @@ PrefabInstance:
     - target: {fileID: 8078806072357997481, guid: 8b5ee5b784e22f440a18677df817f3fe, type: 3}
       propertyPath: prefab
       value: 
-      objectReference: {fileID: 2718036510330271991, guid: 3e3afd03547b2a947a3fa8356b802933, type: 3}
+      objectReference: {fileID: 188692434844595836, guid: b628451b62227824cb30bfcb013c157f, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8b5ee5b784e22f440a18677df817f3fe, type: 3}
 --- !u!114 &1765533564753159758 stripped

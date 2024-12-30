@@ -76,7 +76,7 @@ public class Character : MonoBehaviour
 
     }
 
-    private void Attack(Accuracy accuracy)
+    public void Attack(Accuracy accuracy)
     {
         if (nextSkill == null)
         {
@@ -132,7 +132,12 @@ public class Character : MonoBehaviour
 
     public void GuardCommand(Accuracy accuracy, Arrow arrow)
     {
-        circleManager.PressedAttackCommand(accuracy, arrow);
+        circleManager.PressedGuardCommand(accuracy, arrow);
+    }
+
+    public void GuardAnim()
+    {
+
     }
 
     public void SkillCommand(Accuracy accuracy, int skillIndex)

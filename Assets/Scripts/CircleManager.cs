@@ -82,4 +82,18 @@ public class CircleManager : MonoBehaviour
             spawner.ShowText(Accuracy.Miss);
         }
     }
+    
+    public void PressedGuardCommand(Accuracy accuracy, Arrow arrow)
+    {
+        CircleSpawner spawner = circleSpawners[(int)arrow];
+        if (spawner.ReduceCircleQueue.Count > 0)
+        {
+            spawner.PressedCircle();
+            spawner.ShowText(accuracy);
+        }
+        else
+        {
+            spawner.ShowText(Accuracy.Miss);
+        }
+    }
 }

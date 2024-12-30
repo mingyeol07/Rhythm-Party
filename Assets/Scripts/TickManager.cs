@@ -179,7 +179,7 @@ public class TickManager : MonoBehaviour
             {
                 gameManager.ZoomOutCharacter();
                 gameManager.ZoomOutTargets();
-                gameManager.ZoomOutCam();
+                gameManager.ZoomOutCam(1);
 
                 gameManager.SortEnemyMember();
                 turnState = TurnState.EnemyCommanding;
@@ -205,12 +205,12 @@ public class TickManager : MonoBehaviour
                 gameManager.ZoomOutTargets();
                 gameManager.ZoomInTargets(castingSkill);
 
-                GameManager.Instance.ZoomInCam();
+                gameManager.ZoomInCam(1);
                 castingSkill.GetSkillCommandList(ref noteQueue);
             }
             else
             {
-                gameManager.ZoomOutCam();
+                gameManager.ZoomOutCam(1);
             }
 
             changeSkillCasterFlag = true;
@@ -284,7 +284,7 @@ public class TickManager : MonoBehaviour
             {
                 gameManager.ZoomOutCharacter();
                 gameManager.ZoomOutTargets();
-                gameManager.ZoomOutCam();
+                gameManager.ZoomOutCam(-1);
 
                 turnState = TurnState.Ready;
                 return;
@@ -298,13 +298,13 @@ public class TickManager : MonoBehaviour
                 gameManager.ZoomOutTargets();
                 gameManager.ZoomInTargets(castingSkill);
 
-                gameManager.ZoomInCam();
+                gameManager.ZoomInCam(-1);
 
                 castingSkill.GetSkillCommandList(ref noteQueue);
             }
             else
             {
-                gameManager.ZoomOutCam();
+                gameManager.ZoomOutCam(-1);
             }
 
             changeSkillCasterFlag = true;
@@ -339,7 +339,7 @@ public class TickManager : MonoBehaviour
                 gameManager.PlayPartyTimingCircle(
                     arr[0],
                     realCurrentTime, circleWaitTimeOne,
-                    note.Dir, TimingType.Attack, note.Type,
+                    note.Dir, TimingType.Guard, note.Type,
                     tickCount + circleWaitTickOne);
             }
         }

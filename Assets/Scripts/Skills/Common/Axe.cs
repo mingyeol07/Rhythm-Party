@@ -31,6 +31,9 @@ public class Axe : Skill
 {
              new Note(Arrow.Down, NoteType.Short, 2),
              new Note(Arrow.Down, NoteType.Short, 10),
+             new Note(Arrow.Down, NoteType.Short, 10),
+             new Note(Arrow.Down, NoteType.Short, 10),
+             new Note(Arrow.Down, NoteType.Short, 10),
 };
     }
 }
